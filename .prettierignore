@@ -1,5 +1,7 @@
 **/dist/
 **/temp/
 **/coverage/
+scratch/
 pnpm-lock.yaml
 **/src/**/generated.ts
+**/*.graphql
