@@ -23,5 +23,8 @@
     "graphql-request": "^7.4.0",
     "undici": "^7.16.0",
     "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "msw": "^2.7.0"
   }
 }

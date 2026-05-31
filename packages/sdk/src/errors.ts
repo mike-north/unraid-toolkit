@@ -17,6 +17,8 @@ export const UnraidErrorCode = {
   CONNECTION_FAILED: 'CONNECTION_FAILED',
   /** The API responded with a GraphQL or HTTP error. */
   API_ERROR: 'API_ERROR',
+  /** A requested resource (e.g. a container by id) does not exist. */
+  NOT_FOUND: 'NOT_FOUND',
   /** Caller-supplied input failed validation before any request was made. */
   VALIDATION_ERROR: 'VALIDATION_ERROR',
   /** An unexpected, uncategorized failure. */
