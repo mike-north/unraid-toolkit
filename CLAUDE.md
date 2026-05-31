@@ -4,57 +4,58 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-An MCP (Model Context Protocol) server that lets agents observe and control an **Unraid** server through Unraid's built-in **GraphQL API** (`/graphql`, Unraid 7.2+, `x-api-key` auth). It is distributed as a Docker container ("Unraid App" via Community Applications). We talk to Unraid's GraphQL directly rather than a generic Docker-socket MCP, so Unraid context (templates, autostart, update status) is preserved.
+A toolkit for observing and controlling an **Unraid** server via its built-in **GraphQL API** (`/graphql`, Unraid 7.2+, `x-api-key` auth), structured as a **core SDK with thin CLI and MCP wrappers**. We talk to Unraid's GraphQL directly (not a generic Docker-socket MCP), preserving Unraid context (templates, autostart, update status).
 
-The full design + phased roadmap lives in the approved plan at `~/.claude/plans/i-want-to-create-generic-unicorn.md`.
+The design + phased roadmap lives in the approved plan at `~/.claude/plans/i-want-to-create-generic-unicorn.md`.
+
+## Monorepo layout
+
+pnpm workspace + TypeScript **project references** (composite, `tsc --build`). Dependency direction is strictly **wrappers → SDK**; never the reverse.
+
+| Package (dir)         | Name              | Role                                                                                                          |
+| --------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------- |
+| `packages/sdk`        | `@unraid-cli/sdk` | **Core.** GraphQL client, connection config/auth, validation, domain ops, structured errors, result envelope. |
+| `packages/mcp`        | `@unraid-cli/mcp` | MCP server (bin `unraid-mcp`). Thin adapter: SDK ops → MCP tools.                                             |
+| `packages/cli`        | `@unraid-cli/cli` | Commander CLI (bin `unraid-cli`). Thin adapter: flags → SDK ops → stdout.                                     |
+| `packages/unraid-cli` | `unraid-cli`      | Umbrella: re-exports all three; ships the `unraid-cli` binary.                                                |
+
+Internal deps use `workspace:*` (enforced by syncpack). Each package `tsconfig.json` extends `tsconfig.base.json` and lists `references` to its dependency packages.
+
+## The SDK ↔ wrapper boundary (most important concept)
+
+The SDK owns **all logic and returns a result envelope**; wrappers never throw-handle or reimplement.
+
+- **`UnraidResult<T>`** (`packages/sdk/src/result.ts`) — a discriminated `{ success, data, error }` envelope. Every SDK operation returns it; operations catch transport errors internally and convert them with `toUnraidError` (`errors.ts`) into a structured `UnraidError` (`{ code, message, details? }`). Operations **do not throw** for expected failures.
+- **SDK operations** live in `packages/sdk/src/operations/*.ts` as functions taking an `UnraidClient` (e.g. `getHealth(client)`). `UnraidClient` (`client.ts`) is the single GraphQL boundary: `x-api-key` auth, per-request timeout, and client-scoped TLS-skip via an undici `Agent` dispatcher (never global `NODE_TLS_REJECT_UNAUTHORIZED`).
+- **Connection config** (`config.ts`) is the SDK's only config concern: `resolveConnectionConfig(overrides, env)` layers explicit overrides over `UNRAID_API_URL`/`UNRAID_API_KEY`/`UNRAID_TLS_SKIP_VERIFY`. Wrappers reuse it.
+- **Wrappers adapt the envelope once**: MCP's `formatResult` (`packages/mcp/src/format.ts`) → `CallToolResult`; CLI's `output` (`packages/cli/src/output.ts`) → stdout/stderr. Add a tool group via `packages/mcp/src/tools/<domain>.ts` (`register*Tools`); add a CLI command via `packages/cli/src/commands/<domain>.ts`. Runtime/server concerns (transports, ports, read-only, log level) live in the **wrapper** configs, not the SDK.
 
 ## Commands
 
-Package manager is **pnpm** (enforced via `packageManager`). Use `pnpm exec`, never `npx`/`pnpm dlx tsc`.
+Package manager is **pnpm**. Use `pnpm exec`, never `npx`.
 
-| Task                     | Command                                                  |
-| ------------------------ | -------------------------------------------------------- |
-| Build (emit to `dist/`)  | `pnpm build`                                             |
-| Typecheck only           | `pnpm typecheck`                                         |
-| Lint / autofix           | `pnpm lint` / `pnpm lint:fix`                            |
-| Format / check           | `pnpm format` / `pnpm format:check`                      |
-| Run all tests            | `pnpm test` (vitest)                                     |
-| Watch tests              | `pnpm test:watch`                                        |
-| Single test file         | `pnpm exec vitest run test/config.test.ts`               |
-| Single test by name      | `pnpm exec vitest run -t "rejects missing api key"`      |
-| Type-level tests         | `pnpm test:types` (tsd)                                  |
-| Everything (CI gate)     | `pnpm check` (typecheck + lint + format + test)          |
-| Regenerate GraphQL types | `pnpm codegen` (and `pnpm codegen:check` fails if stale) |
-| Run locally (stdio)      | `UNRAID_API_URL=… UNRAID_API_KEY=… pnpm dev`             |
-
-`/clean_blt` should pass before declaring a task complete.
-
-## Architecture (big picture)
-
-Request flow: **MCP client → transport → `McpServer` (tools) → `UnraidClient` (GraphQL) → Unraid**.
-
-- **`src/index.ts`** — entry point. `loadConfig()` → build `ServerContext` → start the transport(s) chosen by `MCP_TRANSPORT` (`stdio` | `http` | `both`).
-- **`src/server.ts`** — `buildServer(ctx)` constructs the `McpServer` and calls each domain's `register<Domain>Tools(server, ctx)`. **`ServerContext = { config, client, logger }`** is the shared dependency bag threaded everywhere. Adding a tool group = new `src/tools/<domain>.ts` exporting a `register*Tools` function, wired in `buildServer`.
-- **`src/tools/*.ts`** — thin handlers. Each validates input with Zod, calls the GraphQL client, and returns via `toolResult()`/`errorResult()`. Tools declare `annotations` (readOnlyHint/destructiveHint/…) and both `inputSchema` and `outputSchema`. Tool names use `snake_case` with a service prefix (e.g. `unraid_array_status`).
-- **`src/unraid/client.ts`** — the single GraphQL boundary. Wraps `graphql-request`, injects `x-api-key`, normalizes failures into `UnraidApiError` with agent-actionable messages. TLS-skip for self-signed local certs is scoped to this client via a per-instance **undici `Agent` dispatcher** (never the global `NODE_TLS_REJECT_UNAUTHORIZED`).
-- **`src/transports/`** — `stdio.ts` (local) and `http.ts` (Streamable HTTP, the primary hosted transport). HTTP is **stateless**: a fresh `McpServer` + transport per request (`buildServer` is passed as a factory), with `Origin`-header rejection (DNS-rebinding) and optional bearer auth.
-- **`src/config.ts`** — all config is env-driven; `loadConfig()` validates with Zod and throws one multi-line error listing every problem. Env vars: `UNRAID_API_URL`, `UNRAID_API_KEY`, `UNRAID_TLS_SKIP_VERIFY`, `MCP_TRANSPORT`, `MCP_HTTP_PORT`, `MCP_AUTH_TOKEN`, `MCP_READ_ONLY`, `MCP_MAX_BATCH`, `MCP_DENY_TOOLS`, `LOG_LEVEL`, `MCP_AUDIT_LOG`.
-- **`src/format.ts`** — dual markdown/JSON output. Every tool takes `response_format` and returns a `ToolResult` (note: it has an `[key: string]: unknown` index signature so it stays assignable to the SDK's `CallToolResult`). Responses truncate at `CHARACTER_LIMIT`.
-- **`src/log.ts`** — leveled logger that writes **only to stderr**. stdout is the stdio JSON-RPC channel; logging there corrupts the protocol.
-
-### Safety model (planned, partially built)
-
-Destructive control uses three layers (see plan): (1) a **policy floor** independent of client/model — `MCP_READ_ONLY`, `MCP_MAX_BATCH` blast-radius cap, `MCP_DENY_TOOLS`, audit log; (2) **approval UX** detected at `initialize` — MCP elicitation when the client advertises it, confirmation-token fallback otherwise; (3) batch approvals **bound to a hash of the enumerated item IDs** (confused-deputy guard). Keep this layering when implementing Phase 2/3 tools.
+| Task                        | Command                                                             |
+| --------------------------- | ------------------------------------------------------------------- |
+| Build all (incremental)     | `pnpm build` (`tsc --build`)                                        |
+| Full CI gate                | `pnpm check` (build + lint + format:check + syncpack + knip + test) |
+| Lint / fix                  | `pnpm lint` / `pnpm lint:fix`                                       |
+| Format / check              | `pnpm format` / `pnpm format:check`                                 |
+| Test all                    | `pnpm test`                                                         |
+| Test one package            | `pnpm -F @unraid-cli/sdk test`                                      |
+| Single test by name         | `pnpm -F @unraid-cli/sdk exec vitest run -t "<name>"`               |
+| Dep consistency / dead code | `pnpm syncpack:check` / `pnpm knip`                                 |
+| Record a release            | `pnpm changeset`                                                    |
 
 ## Critical gotchas
 
-- **Do NOT enable `skipLibCheck` or disable `exactOptionalPropertyTypes`.** The official `@modelcontextprotocol/sdk` ships `streamableHttp.d.ts` with accessor types incompatible with strict checking. This is fixed by a committed **pnpm patch** (`patches/@modelcontextprotocol__sdk@1.29.0.patch`, wired via `pnpm-workspace.yaml`) that narrows the transport getters. **If you bump the SDK version**, the patch will likely fail to apply — re-create it with `pnpm patch @modelcontextprotocol/sdk@<version>` (narrow the `get sessionId/onclose/onerror/onmessage` return types, drop `| undefined`) in both `dist/esm` and `dist/cjs`.
-- **`src/web-globals.d.ts`** declares the global `HeadersInit` type. `graphql-request` and the SDK reference it but we target the Node `ES2024` lib (no `DOM`), and `@types/node` doesn't expose it as a global. Don't delete it — without it `skipLibCheck:false` fails to compile.
-- **NodeNext + `verbatimModuleSyntax`**: relative imports MUST carry a `.js` extension (e.g. `./config.js`), and type-only imports MUST use `import type`.
-- **Zod 4** (not 3): use `z.enum`, `z.strictObject`, top-level `z.url()`; avoid deprecated `.strict()`/`z.nativeEnum`.
-- **`src/unraid/generated.ts`** is codegen output (excluded from lint/format/coverage). Edit `operations/*.graphql` + the vendored `schema.graphql` and run `pnpm codegen` instead.
+- **Do NOT set `esModuleInterop: false`.** `module: NodeNext` implies `esModuleInterop: true`, which is required to compile zod 4's shipped `.d.cts` declarations under `skipLibCheck:false`. The base config omits the flag (inherits the NodeNext default). Forcing it false breaks the build with ~50 zod TS1259 errors.
+- **Do NOT enable `skipLibCheck` or disable `exactOptionalPropertyTypes`.** The official `@modelcontextprotocol/sdk` ships `streamableHttp.d.ts` with accessor types incompatible with strict checking; this is fixed by a committed **pnpm patch** (`patches/@modelcontextprotocol__sdk@1.29.0.patch`, wired via `pnpm-workspace.yaml`) that narrows the transport getters. **Bumping the SDK version** will likely break the patch — re-create with `pnpm patch @modelcontextprotocol/sdk@<version>` (narrow `get sessionId/onclose/onerror/onmessage`, drop `| undefined`) in both `dist/esm` and `dist/cjs`.
+- **`web-globals.d.ts`** declares the global `HeadersInit` type. It must exist in **every package whose compilation sees** the fetch-typed third-party declarations: `packages/sdk` (graphql-request), `packages/mcp` (MCP SDK transport), and `packages/unraid-cli` (transitively, via re-exporting `@unraid-cli/mcp`'s `McpServer`-typed API). Don't delete these — without them, `skipLibCheck:false` fails.
+- **NodeNext + `verbatimModuleSyntax`**: relative imports MUST carry a `.js` extension; type-only imports MUST use `import type`.
+- **Zod 4** (not 3): use `z.enum`; customize required-field messages with `z.string({ error: '...' })` (the bare default emits "expected string, received undefined" for missing fields).
+- **MCP/CLI entry files guard `main()`** behind an `import.meta.url` main-module check so the umbrella can re-export them without side effects.
 
 ## Conventions
 
-- This is a publishable library + bin: api-extractor is configured; commit `/docs` and `/api-report`, gitignore `/temp`.
-- Tests: Vitest for runtime, tsd for types. Include negative paths; every bug fix gets a regression test. Use fixed date constants / `vi.useFakeTimers()` — never `new Date()` in test data. When a test depends on the Unraid GraphQL schema, add an `@see` link to the authoritative docs.
+- Tests: Vitest. Include negative paths; every bug fix gets a regression test. Use fixed date constants / `vi.useFakeTimers()` — never `new Date()` in test data. When a test depends on the Unraid GraphQL schema, add an `@see` link to the authoritative docs.
+- Releases via **Changesets** (`access: public`). Internal `@unraid-cli/*` deps are pinned to `workspace:*` (syncpack-enforced); `typescript` is pinned to a minor (`~`) because api-extractor expects 5.9.x.

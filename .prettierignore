@@ -1,6 +1,5 @@
-dist/
-temp/
-coverage/
+**/dist/
+**/temp/
+**/coverage/
 pnpm-lock.yaml
-src/unraid/generated.ts
-src/unraid/schema.graphql
+**/src/**/generated.ts

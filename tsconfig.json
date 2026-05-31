@@ -1,36 +1,9 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
-  "compilerOptions": {
-    "target": "ES2024",
-    "lib": ["ES2024"],
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "types": ["node"],
-
-    "rootDir": ".",
-    "outDir": "dist",
-
-    /* Strictness — full strict set per project conventions */
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noPropertyAccessFromIndexSignature": true,
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-
-    /* Emit */
-    "noEmitOnError": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": false
-  },
-  "include": ["src/**/*", "test/**/*", "codegen.ts", "vitest.config.ts"]
+  "files": [],
+  "references": [
+    { "path": "packages/sdk" },
+    { "path": "packages/mcp" },
+    { "path": "packages/cli" },
+    { "path": "packages/unraid-cli" }
+  ]
 }

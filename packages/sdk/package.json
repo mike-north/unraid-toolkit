@@ -1,0 +1,27 @@
+{
+  "name": "@unraid-cli/sdk",
+  "version": "0.1.0",
+  "description": "Core SDK for the Unraid GraphQL API: typed client, domain operations, and a structured result envelope. No protocol or UI concerns.",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "vitest run --passWithNoTests"
+  },
+  "dependencies": {
+    "graphql": "^16.14.0",
+    "graphql-request": "^7.4.0",
+    "undici": "^7.16.0",
+    "zod": "^4.4.3"
+  }
+}

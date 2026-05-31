@@ -5,6 +5,9 @@ node_modules/
 dist/
 *.tsbuildinfo
 
+# Git worktrees
+.worktrees/
+
 # API Extractor intermediates
 temp/
 

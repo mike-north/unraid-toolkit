@@ -6,7 +6,14 @@ import prettier from 'eslint-config-prettier';
 
 export default defineConfig(
   {
-    ignores: ['dist/**', 'temp/**', 'coverage/**', 'src/unraid/generated.ts'],
+    ignores: [
+      '**/dist/**',
+      '**/temp/**',
+      '**/coverage/**',
+      '**/*.config.js',
+      '**/*.config.cjs',
+      'packages/*/src/**/generated.ts',
+    ],
   },
   eslint.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
@@ -14,9 +21,7 @@ export default defineConfig(
   {
     languageOptions: {
       parserOptions: {
-        projectService: {
-          allowDefaultProject: ['eslint.config.js'],
-        },
+        projectService: true,
         tsconfigRootDir: import.meta.dirname,
       },
     },
@@ -28,9 +33,8 @@ export default defineConfig(
       ],
     },
   },
-  // Tests may use looser assertions against untyped fixtures.
   {
-    files: ['test/**/*.ts', 'src/**/*.test.ts'],
+    files: ['**/test/**/*.ts', '**/*.test.ts'],
     rules: {
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-unsafe-member-access': 'off',
