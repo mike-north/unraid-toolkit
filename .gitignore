@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+*.tsbuildinfo
+
+# API Extractor intermediates
+temp/
+
+# Test / coverage
+coverage/
+
+# Logs
+*.log
+
+# Scratch / temporary artifacts
+scratch/
+
+# Env & secrets
+.env
+*.local.*
+
+# OS
+.DS_Store
+
+# Claude Code local configuration (auto-added)
+.claude/*.local.*

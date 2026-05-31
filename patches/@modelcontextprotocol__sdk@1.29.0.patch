@@ -1,0 +1,62 @@
+diff --git a/dist/cjs/server/streamableHttp.d.ts b/dist/cjs/server/streamableHttp.d.ts
+index 5d5564bd11a519ce6f4aa02d5d9907f3b10139c2..dd7c857f29670a1c23842d958dde45bd871203f0 100644
+--- a/dist/cjs/server/streamableHttp.d.ts
++++ b/dist/cjs/server/streamableHttp.d.ts
+@@ -63,22 +63,22 @@ export declare class StreamableHTTPServerTransport implements Transport {
+     /**
+      * Gets the session ID for this transport instance.
+      */
+-    get sessionId(): string | undefined;
++    get sessionId(): string;
+     /**
+      * Sets callback for when the transport is closed.
+      */
+     set onclose(handler: (() => void) | undefined);
+-    get onclose(): (() => void) | undefined;
++    get onclose(): () => void;
+     /**
+      * Sets callback for transport errors.
+      */
+     set onerror(handler: ((error: Error) => void) | undefined);
+-    get onerror(): ((error: Error) => void) | undefined;
++    get onerror(): (error: Error) => void;
+     /**
+      * Sets callback for incoming messages.
+      */
+     set onmessage(handler: ((message: JSONRPCMessage, extra?: MessageExtraInfo) => void) | undefined);
+-    get onmessage(): ((message: JSONRPCMessage, extra?: MessageExtraInfo) => void) | undefined;
++    get onmessage(): (message: JSONRPCMessage, extra?: MessageExtraInfo) => void;
+     /**
+      * Starts the transport. This is required by the Transport interface but is a no-op
+      * for the Streamable HTTP transport as connections are managed per-request.
+diff --git a/dist/esm/server/streamableHttp.d.ts b/dist/esm/server/streamableHttp.d.ts
+index 5d5564bd11a519ce6f4aa02d5d9907f3b10139c2..dd7c857f29670a1c23842d958dde45bd871203f0 100644
+--- a/dist/esm/server/streamableHttp.d.ts
++++ b/dist/esm/server/streamableHttp.d.ts
+@@ -63,22 +63,22 @@ export declare class StreamableHTTPServerTransport implements Transport {
+     /**
+      * Gets the session ID for this transport instance.
+      */
+-    get sessionId(): string | undefined;
++    get sessionId(): string;
+     /**
+      * Sets callback for when the transport is closed.
+      */
+     set onclose(handler: (() => void) | undefined);
+-    get onclose(): (() => void) | undefined;
++    get onclose(): () => void;
+     /**
+      * Sets callback for transport errors.
+      */
+     set onerror(handler: ((error: Error) => void) | undefined);
+-    get onerror(): ((error: Error) => void) | undefined;
++    get onerror(): (error: Error) => void;
+     /**
+      * Sets callback for incoming messages.
+      */
+     set onmessage(handler: ((message: JSONRPCMessage, extra?: MessageExtraInfo) => void) | undefined);
+-    get onmessage(): ((message: JSONRPCMessage, extra?: MessageExtraInfo) => void) | undefined;
++    get onmessage(): (message: JSONRPCMessage, extra?: MessageExtraInfo) => void;
+     /**
+      * Starts the transport. This is required by the Transport interface but is a no-op
+      * for the Streamable HTTP transport as connections are managed per-request.
