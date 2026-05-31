@@ -16,7 +16,7 @@ A core SDK holds all the real logic; the CLI and MCP server are thin adapters ov
       │   │
 @unraid-cli/cli   @unraid-cli/mcp   ← thin wrappers (Commander CLI / MCP server)
       ▲   ▲   ▲
-      └───┴───┴── unraid-cli         ← umbrella: re-exports all three, ships the `unraid-cli` binary
+      └───┴───┴── unraid-cli         ← umbrella: re-exports all three, ships the `unraid` binary
 ```
 
 | Package                             | Role                                                                                                                                                                     |
@@ -24,7 +24,7 @@ A core SDK holds all the real logic; the CLI and MCP server are thin adapters ov
 | [`@unraid-cli/sdk`](packages/sdk)   | Core SDK. Owns the GraphQL transport, API-key auth, validation, domain models, structured errors, and the `UnraidResult<T>` result envelope. No protocol or UI concerns. |
 | [`@unraid-cli/cli`](packages/cli)   | Commander-based CLI. Parses flags, calls SDK operations, formats output (JSON / human).                                                                                  |
 | [`@unraid-cli/mcp`](packages/mcp)   | Model Context Protocol server. Exposes SDK operations as MCP tools over stdio / Streamable HTTP.                                                                         |
-| [`unraid-cli`](packages/unraid-cli) | Umbrella package. Re-exports the three above and provides the `unraid-cli` command.                                                                                      |
+| [`unraid-cli`](packages/unraid-cli) | Umbrella package. Re-exports the three above and provides the `unraid` command.                                                                                          |
 
 The boundary is deliberate: **operations, validation, and error handling live in the SDK once**; each wrapper only adapts input (flags vs. tool schemas) and output (stdout vs. `CallToolResult`). Adding a third interface (e.g. an HTTP API) would be another thin adapter, not a reimplementation.
 
@@ -50,13 +50,16 @@ The MCP server additionally reads runtime settings: `MCP_TRANSPORT` (`stdio`\|`h
 
 ### CLI
 
+Installing the umbrella package globally provides the `unraid` command:
+
 ```bash
-pnpm install && pnpm build
-UNRAID_API_URL=https://tower.local/graphql UNRAID_API_KEY=your-key \
-  node packages/cli/dist/index.js health
+pnpm add -g unraid-cli
+UNRAID_API_URL=https://tower.local/graphql UNRAID_API_KEY=your-key unraid health
 # or pass connection details as flags:
-node packages/cli/dist/index.js health --url https://tower.local/graphql --api-key your-key --insecure
+unraid health --url https://tower.local/graphql --api-key your-key --insecure
 ```
+
+From a source checkout, the same binary is `node packages/cli/dist/index.js` after `pnpm build`.
 
 Global flags: `--url`, `--api-key`, `--insecure` (skip TLS), `--json` (default) / `--human`.
 

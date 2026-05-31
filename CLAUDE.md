@@ -16,8 +16,8 @@ pnpm workspace + TypeScript **project references** (composite, `tsc --build`). D
 | --------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------- |
 | `packages/sdk`        | `@unraid-cli/sdk` | **Core.** GraphQL client, connection config/auth, validation, domain ops, structured errors, result envelope. |
 | `packages/mcp`        | `@unraid-cli/mcp` | MCP server (bin `unraid-mcp`). Thin adapter: SDK ops → MCP tools.                                             |
-| `packages/cli`        | `@unraid-cli/cli` | Commander CLI (bin `unraid-cli`). Thin adapter: flags → SDK ops → stdout.                                     |
-| `packages/unraid-cli` | `unraid-cli`      | Umbrella: re-exports all three; ships the `unraid-cli` binary.                                                |
+| `packages/cli`        | `@unraid-cli/cli` | Commander CLI (bin `unraid`). Thin adapter: flags → SDK ops → stdout.                                         |
+| `packages/unraid-cli` | `unraid-cli`      | Umbrella: re-exports all three; ships the `unraid` binary.                                                    |
 
 Internal deps use `workspace:*` (enforced by syncpack). Each package `tsconfig.json` extends `tsconfig.base.json` and lists `references` to its dependency packages.
 

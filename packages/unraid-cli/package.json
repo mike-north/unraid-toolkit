@@ -1,13 +1,13 @@
 {
   "name": "unraid-cli",
   "version": "0.1.0",
-  "description": "Unraid toolkit umbrella — re-exports the SDK, CLI, and MCP server, and ships the `unraid-cli` command.",
+  "description": "Unraid toolkit umbrella — re-exports the SDK, CLI, and MCP server, and ships the `unraid` command.",
   "license": "MIT",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "unraid-cli": "./dist/bin.js"
+    "unraid": "./dist/bin.js"
   },
   "files": [
     "dist"

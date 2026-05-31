@@ -32,7 +32,7 @@ interface RawGlobalOpts {
 }
 
 /**
- * Build and configure the root Commander program for `unraid-cli`.
+ * Build and configure the root Commander program for the `unraid` CLI.
  *
  * @returns The configured Commander {@link Command} instance, ready for `.parse()`.
  */
@@ -40,7 +40,7 @@ export function createCli(): Command {
   const program = new Command();
 
   program
-    .name('unraid-cli')
+    .name('unraid')
     .description('Unraid CLI — observe and control an Unraid server via its GraphQL API')
     .version('0.1.0')
     .option('--url <url>', 'Unraid GraphQL endpoint (env: UNRAID_API_URL)')
