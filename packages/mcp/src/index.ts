@@ -6,6 +6,7 @@
  * exposes {@link buildServer} and config helpers without side effects.
  */
 
+import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createClient, resolveConnectionConfig, type ConnectionConfig } from '@unraid-cli/sdk';
 import { loadMcpConfig, type McpConfig } from './config.js';
@@ -66,7 +67,10 @@ export async function main(): Promise<void> {
 }
 
 const entryPath = process.argv[1];
-const isMainModule = entryPath !== undefined && import.meta.url === pathToFileURL(entryPath).href;
+// Resolve to an absolute path first so the comparison holds when the script is
+// launched via a relative path (e.g. `node packages/mcp/dist/index.js`).
+const isMainModule =
+  entryPath !== undefined && import.meta.url === pathToFileURL(resolve(entryPath)).href;
 if (isMainModule) {
   main().catch((error: unknown) => {
     process.stderr.write(`Fatal: ${error instanceof Error ? error.message : String(error)}\n`);
