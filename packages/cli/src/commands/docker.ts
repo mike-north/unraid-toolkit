@@ -3,9 +3,33 @@
  */
 
 import type { Command } from 'commander';
-import { listContainers, getContainer, getContainerLogs, getUpdateStatuses } from '@unraid-cli/sdk';
+import {
+  listContainers,
+  getContainer,
+  getContainerLogs,
+  getUpdateStatuses,
+  startContainer,
+  stopContainer,
+  pauseContainer,
+  unpauseContainer,
+  updateContainer,
+  updateAllContainers,
+} from '@unraid-cli/sdk';
 import type { GlobalOptions } from '../cli.js';
 import { runAction, parseIntFlag } from './run.js';
+
+/** Single-container lifecycle subcommands: `docker <action> <id>`. */
+const CONTAINER_ACTIONS = [
+  { name: 'start', desc: 'Start a stopped container.', op: startContainer },
+  { name: 'stop', desc: 'Stop a running container.', op: stopContainer },
+  { name: 'pause', desc: 'Pause (suspend) a running container.', op: pauseContainer },
+  { name: 'unpause', desc: 'Unpause (resume) a paused container.', op: unpauseContainer },
+  {
+    name: 'update',
+    desc: 'Pull the latest image and recreate the container.',
+    op: updateContainer,
+  },
+] as const;
 
 /** Register `docker containers|container|logs|update-status` commands. */
 export function registerDockerCommands(
@@ -57,5 +81,22 @@ export function registerDockerCommands(
       await runAction(getGlobals(this), (client) =>
         getUpdateStatuses(client, { limit: opts.limit, offset: opts.offset }),
       );
+    });
+
+  for (const { name, desc, op } of CONTAINER_ACTIONS) {
+    docker
+      .command(name)
+      .description(desc)
+      .argument('<id>', 'The container id')
+      .action(async function (this: Command, id: string) {
+        await runAction(getGlobals(this), (client) => op(client, id));
+      });
+  }
+
+  docker
+    .command('update-all')
+    .description('Update every container that has an available image update.')
+    .action(async function (this: Command) {
+      await runAction(getGlobals(this), (client) => updateAllContainers(client));
     });
 }

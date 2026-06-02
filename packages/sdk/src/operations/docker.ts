@@ -26,6 +26,12 @@ import type {
   GetContainerLogsQuery,
   GetContainerLogsQueryVariables,
   GetContainerUpdateStatusesQuery,
+  StartContainerMutation,
+  StopContainerMutation,
+  PauseContainerMutation,
+  UnpauseContainerMutation,
+  UpdateContainerMutation,
+  UpdateAllContainersMutation,
 } from '../unraid/generated.js';
 
 /** A container as returned by the list view. */
@@ -247,6 +253,173 @@ export async function getUpdateStatuses(
       CONTAINER_UPDATE_STATUSES_QUERY,
     );
     return success(paginateList(data.docker.containerUpdateStatuses, pagination));
+  } catch (error) {
+    return failure(toUnraidError(error));
+  }
+}
+
+// --- Phase 2: safe container lifecycle control ---------------------------------
+
+/** A container's post-action identity and state. */
+export type DockerContainerState = StartContainerMutation['docker']['start'];
+
+/** Run a single-container control mutation and wrap it in the result envelope. */
+async function execContainerAction(
+  run: () => Promise<DockerContainerState>,
+): Promise<UnraidResult<DockerContainerState>> {
+  try {
+    return success(await run());
+  } catch (error) {
+    return failure(toUnraidError(error));
+  }
+}
+
+const START_CONTAINER_MUTATION = gql`
+  mutation StartContainer($id: PrefixedID!) {
+    docker {
+      start(id: $id) {
+        id
+        names
+        image
+        state
+        status
+      }
+    }
+  }
+`;
+
+/** Start a stopped container. */
+export async function startContainer(
+  client: UnraidClient,
+  id: string,
+): Promise<UnraidResult<DockerContainerState>> {
+  return execContainerAction(async () => {
+    const data = await client.request<StartContainerMutation>(START_CONTAINER_MUTATION, { id });
+    return data.docker.start;
+  });
+}
+
+const STOP_CONTAINER_MUTATION = gql`
+  mutation StopContainer($id: PrefixedID!) {
+    docker {
+      stop(id: $id) {
+        id
+        names
+        image
+        state
+        status
+      }
+    }
+  }
+`;
+
+/** Stop a running container. */
+export async function stopContainer(
+  client: UnraidClient,
+  id: string,
+): Promise<UnraidResult<DockerContainerState>> {
+  return execContainerAction(async () => {
+    const data = await client.request<StopContainerMutation>(STOP_CONTAINER_MUTATION, { id });
+    return data.docker.stop;
+  });
+}
+
+const PAUSE_CONTAINER_MUTATION = gql`
+  mutation PauseContainer($id: PrefixedID!) {
+    docker {
+      pause(id: $id) {
+        id
+        names
+        image
+        state
+        status
+      }
+    }
+  }
+`;
+
+/** Pause (suspend) a running container. */
+export async function pauseContainer(
+  client: UnraidClient,
+  id: string,
+): Promise<UnraidResult<DockerContainerState>> {
+  return execContainerAction(async () => {
+    const data = await client.request<PauseContainerMutation>(PAUSE_CONTAINER_MUTATION, { id });
+    return data.docker.pause;
+  });
+}
+
+const UNPAUSE_CONTAINER_MUTATION = gql`
+  mutation UnpauseContainer($id: PrefixedID!) {
+    docker {
+      unpause(id: $id) {
+        id
+        names
+        image
+        state
+        status
+      }
+    }
+  }
+`;
+
+/** Unpause (resume) a paused container. */
+export async function unpauseContainer(
+  client: UnraidClient,
+  id: string,
+): Promise<UnraidResult<DockerContainerState>> {
+  return execContainerAction(async () => {
+    const data = await client.request<UnpauseContainerMutation>(UNPAUSE_CONTAINER_MUTATION, { id });
+    return data.docker.unpause;
+  });
+}
+
+const UPDATE_CONTAINER_MUTATION = gql`
+  mutation UpdateContainer($id: PrefixedID!) {
+    docker {
+      updateContainer(id: $id) {
+        id
+        names
+        image
+        state
+        status
+      }
+    }
+  }
+`;
+
+/** Pull the latest image for a single container and recreate it. */
+export async function updateContainer(
+  client: UnraidClient,
+  id: string,
+): Promise<UnraidResult<DockerContainerState>> {
+  return execContainerAction(async () => {
+    const data = await client.request<UpdateContainerMutation>(UPDATE_CONTAINER_MUTATION, { id });
+    return data.docker.updateContainer;
+  });
+}
+
+const UPDATE_ALL_CONTAINERS_MUTATION = gql`
+  mutation UpdateAllContainers {
+    docker {
+      updateAllContainers {
+        id
+        names
+        image
+        state
+        status
+      }
+    }
+  }
+`;
+
+/** Update every container that has an available image update. */
+export async function updateAllContainers(
+  client: UnraidClient,
+): Promise<UnraidResult<readonly DockerContainerState[]>> {
+  try {
+    const data = await client.request<UpdateAllContainersMutation>(UPDATE_ALL_CONTAINERS_MUTATION);
+    return success(data.docker.updateAllContainers);
   } catch (error) {
     return failure(toUnraidError(error));
   }

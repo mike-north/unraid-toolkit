@@ -3447,6 +3447,46 @@ export type GetContainerUpdateStatusesQueryVariables = Exact<{ [key: string]: ne
 
 export type GetContainerUpdateStatusesQuery = { docker: { containerUpdateStatuses: Array<{ name: string, updateStatus: UpdateStatus }> } };
 
+export type StartContainerMutationVariables = Exact<{
+  id: Scalars['PrefixedID']['input'];
+}>;
+
+
+export type StartContainerMutation = { docker: { start: { id: string, names: Array<string>, image: string, state: ContainerState, status: string } } };
+
+export type StopContainerMutationVariables = Exact<{
+  id: Scalars['PrefixedID']['input'];
+}>;
+
+
+export type StopContainerMutation = { docker: { stop: { id: string, names: Array<string>, image: string, state: ContainerState, status: string } } };
+
+export type PauseContainerMutationVariables = Exact<{
+  id: Scalars['PrefixedID']['input'];
+}>;
+
+
+export type PauseContainerMutation = { docker: { pause: { id: string, names: Array<string>, image: string, state: ContainerState, status: string } } };
+
+export type UnpauseContainerMutationVariables = Exact<{
+  id: Scalars['PrefixedID']['input'];
+}>;
+
+
+export type UnpauseContainerMutation = { docker: { unpause: { id: string, names: Array<string>, image: string, state: ContainerState, status: string } } };
+
+export type UpdateContainerMutationVariables = Exact<{
+  id: Scalars['PrefixedID']['input'];
+}>;
+
+
+export type UpdateContainerMutation = { docker: { updateContainer: { id: string, names: Array<string>, image: string, state: ContainerState, status: string } } };
+
+export type UpdateAllContainersMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type UpdateAllContainersMutation = { docker: { updateAllContainers: Array<{ id: string, names: Array<string>, image: string, state: ContainerState, status: string }> } };
+
 export type ListNotificationsQueryVariables = Exact<{
   filter: NotificationFilter;
 }>;
@@ -3458,6 +3498,27 @@ export type GetNotificationOverviewQueryVariables = Exact<{ [key: string]: never
 
 
 export type GetNotificationOverviewQuery = { notifications: { overview: { unread: { info: number, warning: number, alert: number, total: number }, archive: { info: number, warning: number, alert: number, total: number } } } };
+
+export type CreateNotificationMutationVariables = Exact<{
+  input: NotificationData;
+}>;
+
+
+export type CreateNotificationMutation = { createNotification: { id: string, title: string, subject: string, description: string, importance: NotificationImportance, link: string | null, type: NotificationType, timestamp: string | null, formattedTimestamp: string | null } };
+
+export type ArchiveNotificationMutationVariables = Exact<{
+  id: Scalars['PrefixedID']['input'];
+}>;
+
+
+export type ArchiveNotificationMutation = { archiveNotification: { id: string, title: string, subject: string, description: string, importance: NotificationImportance, link: string | null, type: NotificationType, timestamp: string | null, formattedTimestamp: string | null } };
+
+export type UnarchiveNotificationMutationVariables = Exact<{
+  id: Scalars['PrefixedID']['input'];
+}>;
+
+
+export type UnarchiveNotificationMutation = { unreadNotification: { id: string, title: string, subject: string, description: string, importance: NotificationImportance, link: string | null, type: NotificationType, timestamp: string | null, formattedTimestamp: string | null } };
 
 export type ListSharesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3483,3 +3544,31 @@ export type ListVmsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type ListVmsQuery = { vms: { domains: Array<{ id: string, name: string | null, state: VmState }> | null } };
+
+export type StartVmMutationVariables = Exact<{
+  id: Scalars['PrefixedID']['input'];
+}>;
+
+
+export type StartVmMutation = { vm: { start: boolean } };
+
+export type StopVmMutationVariables = Exact<{
+  id: Scalars['PrefixedID']['input'];
+}>;
+
+
+export type StopVmMutation = { vm: { stop: boolean } };
+
+export type PauseVmMutationVariables = Exact<{
+  id: Scalars['PrefixedID']['input'];
+}>;
+
+
+export type PauseVmMutation = { vm: { pause: boolean } };
+
+export type ResumeVmMutationVariables = Exact<{
+  id: Scalars['PrefixedID']['input'];
+}>;
+
+
+export type ResumeVmMutation = { vm: { resume: boolean } };

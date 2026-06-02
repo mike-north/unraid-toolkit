@@ -4,11 +4,60 @@
 
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { listContainers, getContainer, getContainerLogs, getUpdateStatuses } from '@unraid-cli/sdk';
+import {
+  listContainers,
+  getContainer,
+  getContainerLogs,
+  getUpdateStatuses,
+  startContainer,
+  stopContainer,
+  pauseContainer,
+  unpauseContainer,
+  updateContainer,
+  updateAllContainers,
+  type UnraidClient,
+  type UnraidResult,
+  type DockerContainerState,
+} from '@unraid-cli/sdk';
 import { formatResult } from '../format.js';
-import { READ_ONLY_ANNOTATIONS } from './annotations.js';
+import { READ_ONLY_ANNOTATIONS, SAFE_WRITE_ANNOTATIONS } from './annotations.js';
 import { PAGINATION_INPUT } from './pagination.js';
+import { readOnlyBlock } from './policy.js';
 import type { ServerContext } from '../server.js';
+
+/** Phase 2 single-container lifecycle controls, each a `(client, id)` op. */
+const CONTAINER_ACTIONS = [
+  {
+    tool: 'unraid_docker_start',
+    title: 'Start Unraid Container',
+    verb: 'Start',
+    op: startContainer,
+  },
+  { tool: 'unraid_docker_stop', title: 'Stop Unraid Container', verb: 'Stop', op: stopContainer },
+  {
+    tool: 'unraid_docker_pause',
+    title: 'Pause Unraid Container',
+    verb: 'Pause (suspend)',
+    op: pauseContainer,
+  },
+  {
+    tool: 'unraid_docker_unpause',
+    title: 'Unpause Unraid Container',
+    verb: 'Unpause (resume)',
+    op: unpauseContainer,
+  },
+  {
+    tool: 'unraid_docker_update',
+    title: 'Update Unraid Container',
+    verb: 'Pull the latest image for and recreate',
+    op: updateContainer,
+  },
+] as const satisfies readonly {
+  tool: string;
+  title: string;
+  verb: string;
+  op: (client: UnraidClient, id: string) => Promise<UnraidResult<DockerContainerState>>;
+}[];
 
 /** Register Docker tools on the given server. */
 export function registerDockerTools(server: McpServer, ctx: ServerContext): void {
@@ -63,5 +112,29 @@ export function registerDockerTools(server: McpServer, ctx: ServerContext): void
     },
     async ({ limit, offset }) =>
       formatResult(await getUpdateStatuses(ctx.client, { limit, offset })),
+  );
+
+  for (const { tool, title, verb, op } of CONTAINER_ACTIONS) {
+    server.registerTool(
+      tool,
+      {
+        title,
+        description: `${verb} the Docker container with the given id. Returns the container's resulting state.`,
+        inputSchema: { id: z.string().describe('The container id (PrefixedID)') },
+        annotations: SAFE_WRITE_ANNOTATIONS,
+      },
+      async ({ id }) => readOnlyBlock(ctx) ?? formatResult(await op(ctx.client, id)),
+    );
+  }
+
+  server.registerTool(
+    'unraid_docker_update_all',
+    {
+      title: 'Update All Unraid Containers',
+      description: `Update every Docker container that has an available image update. Returns the resulting state of each updated container.`,
+      inputSchema: {},
+      annotations: SAFE_WRITE_ANNOTATIONS,
+    },
+    async () => readOnlyBlock(ctx) ?? formatResult(await updateAllContainers(ctx.client)),
   );
 }

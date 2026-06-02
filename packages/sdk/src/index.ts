@@ -44,16 +44,31 @@ export {
   getContainer,
   getContainerLogs,
   getUpdateStatuses,
+  startContainer,
+  stopContainer,
+  pauseContainer,
+  unpauseContainer,
+  updateContainer,
+  updateAllContainers,
   type DockerContainerSummary,
   type DockerContainerDetail,
   type ContainerLogs,
   type ContainerLogLine,
   type ContainerLogsParams,
   type ContainerUpdateStatus,
+  type DockerContainerState,
 } from './operations/docker.js';
 
 // VMs
-export { listVms, type VmSummary } from './operations/vm.js';
+export {
+  listVms,
+  startVm,
+  stopVm,
+  pauseVm,
+  resumeVm,
+  type VmSummary,
+  type VmActionResult,
+} from './operations/vm.js';
 
 // Shares
 export { listShares, type ShareSummary } from './operations/shares.js';
@@ -62,9 +77,14 @@ export { listShares, type ShareSummary } from './operations/shares.js';
 export {
   listNotifications,
   getNotificationOverview,
+  createNotification,
+  archiveNotification,
+  unarchiveNotification,
   type NotificationItem,
   type NotificationOverview,
   type ListNotificationsParams,
+  type NotificationDetail,
+  type NewNotification,
 } from './operations/notifications.js';
 
 // UPS
