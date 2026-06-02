@@ -62,3 +62,19 @@ export function parseIntFlag(value: string): number {
   }
   return parsed;
 }
+
+/**
+ * Confirmation gate for destructive CLI commands (the CLI's human-in-the-loop
+ * equivalent of the MCP approval layer). Returns `true` when the caller passed
+ * `--yes`; otherwise prints the impact and how to confirm, sets a failure exit
+ * code, and returns `false` so the command aborts without calling the SDK.
+ */
+export function confirmDestructive(impact: string, yes: boolean | undefined): boolean {
+  if (yes === true) return true;
+  console.error(
+    `Refusing destructive operation without confirmation: ${impact}\n` +
+      `This cannot be undone. Re-run with --yes to proceed.`,
+  );
+  process.exitCode = 1;
+  return false;
+}

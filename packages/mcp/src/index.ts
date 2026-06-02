@@ -11,6 +11,8 @@ import { pathToFileURL } from 'node:url';
 import { createClient, resolveConnectionConfig, type ConnectionConfig } from '@unraid-cli/sdk';
 import { loadMcpConfig, type McpConfig } from './config.js';
 import { createLogger } from './log.js';
+import { createAuditLog } from './audit.js';
+import { TokenStore } from './approval.js';
 import { buildServer, type ServerContext } from './server.js';
 import { startStdio } from './transports/stdio.js';
 import { startHttp } from './transports/http.js';
@@ -33,7 +35,8 @@ export async function main(): Promise<void> {
 
   const logger = createLogger(runtime.logLevel);
   const client = createClient(connection);
-  const ctx: ServerContext = { client, config: runtime, logger };
+  const audit = createAuditLog(runtime.auditLogPath, logger);
+  const ctx: ServerContext = { client, config: runtime, logger, audit, tokens: new TokenStore() };
 
   logger.info('Starting Unraid MCP server', {
     transport: runtime.transport,

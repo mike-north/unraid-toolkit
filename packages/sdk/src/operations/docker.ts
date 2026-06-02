@@ -32,6 +32,7 @@ import type {
   UnpauseContainerMutation,
   UpdateContainerMutation,
   UpdateAllContainersMutation,
+  RemoveContainerMutation,
 } from '../unraid/generated.js';
 
 /** A container as returned by the list view. */
@@ -420,6 +421,49 @@ export async function updateAllContainers(
   try {
     const data = await client.request<UpdateAllContainersMutation>(UPDATE_ALL_CONTAINERS_MUTATION);
     return success(data.docker.updateAllContainers);
+  } catch (error) {
+    return failure(toUnraidError(error));
+  }
+}
+
+// --- Phase 3: destructive container control -----------------------------------
+
+/** Outcome of removing a container. */
+export interface RemoveContainerResult {
+  /** The container id that was removed. */
+  readonly id: string;
+  /** Whether the backing image was also removed. */
+  readonly withImage: boolean;
+  /** Whether the server acknowledged the removal. */
+  readonly removed: boolean;
+}
+
+const REMOVE_CONTAINER_MUTATION = gql`
+  mutation RemoveContainer($id: PrefixedID!, $withImage: Boolean) {
+    docker {
+      removeContainer(id: $id, withImage: $withImage)
+    }
+  }
+`;
+
+/**
+ * Remove a container, optionally deleting its backing image.
+ *
+ * Destructive and irreversible: wrappers gate this behind explicit human
+ * approval. `withImage: true` also removes the image, which other containers
+ * may depend on.
+ */
+export async function removeContainer(
+  client: UnraidClient,
+  id: string,
+  withImage = false,
+): Promise<UnraidResult<RemoveContainerResult>> {
+  try {
+    const data = await client.request<RemoveContainerMutation>(REMOVE_CONTAINER_MUTATION, {
+      id,
+      withImage,
+    });
+    return success({ id, withImage, removed: data.docker.removeContainer });
   } catch (error) {
     return failure(toUnraidError(error));
   }

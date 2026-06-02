@@ -7,6 +7,8 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { UnraidClient } from '@unraid-cli/sdk';
 import type { McpConfig } from './config.js';
 import type { Logger } from './log.js';
+import type { AuditLog } from './audit.js';
+import { TokenStore } from './approval.js';
 import { registerAllTools } from './tools/index.js';
 
 /** Shared dependencies passed to every tool group. */
@@ -14,6 +16,10 @@ export interface ServerContext {
   client: UnraidClient;
   config: McpConfig;
   logger: Logger;
+  /** Layer-1 audit sink for mutations. */
+  audit: AuditLog;
+  /** Layer-2 confirmation-token store (token-gate fallback). */
+  tokens: TokenStore;
 }
 
 export const SERVER_NAME = 'unraid-mcp';

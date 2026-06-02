@@ -15,14 +15,21 @@ import {
   unpauseContainer,
   updateContainer,
   updateAllContainers,
+  removeContainer,
   type UnraidClient,
   type UnraidResult,
   type DockerContainerState,
 } from '@unraid-cli/sdk';
 import { formatResult } from '../format.js';
-import { READ_ONLY_ANNOTATIONS, SAFE_WRITE_ANNOTATIONS } from './annotations.js';
+import {
+  READ_ONLY_ANNOTATIONS,
+  SAFE_WRITE_ANNOTATIONS,
+  DESTRUCTIVE_ANNOTATIONS,
+} from './annotations.js';
 import { PAGINATION_INPUT } from './pagination.js';
+import { CONFIRM_TOKEN_INPUT } from './confirm.js';
 import { readOnlyBlock } from './policy.js';
+import { runDestructive } from './destructive.js';
 import type { ServerContext } from '../server.js';
 
 /** Phase 2 single-container lifecycle controls, each a `(client, id)` op. */
@@ -136,5 +143,28 @@ export function registerDockerTools(server: McpServer, ctx: ServerContext): void
       annotations: SAFE_WRITE_ANNOTATIONS,
     },
     async () => readOnlyBlock(ctx) ?? formatResult(await updateAllContainers(ctx.client)),
+  );
+
+  // --- Phase 3: destructive container control ---
+  server.registerTool(
+    'unraid_docker_remove',
+    {
+      title: 'Remove Unraid Container',
+      description: `Remove a Docker container, optionally deleting its backing image (withImage). Irreversible and destructive — requires human approval.`,
+      inputSchema: {
+        id: z.string().describe('The container id (PrefixedID)'),
+        withImage: z.boolean().optional().describe('Also remove the backing image (default false)'),
+        ...CONFIRM_TOKEN_INPUT,
+      },
+      annotations: DESTRUCTIVE_ANNOTATIONS,
+    },
+    async ({ id, withImage, confirm_token }) =>
+      runDestructive(server, ctx, {
+        tool: 'unraid_docker_remove',
+        summary: `Remove container ${id}${withImage === true ? ' and its image' : ''}`,
+        targets: [id],
+        token: confirm_token,
+        run: () => removeContainer(ctx.client, id, withImage ?? false),
+      }),
   );
 }
