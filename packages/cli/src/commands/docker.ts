@@ -14,9 +14,10 @@ import {
   unpauseContainer,
   updateContainer,
   updateAllContainers,
+  removeContainer,
 } from '@unraid-cli/sdk';
 import type { GlobalOptions } from '../cli.js';
-import { runAction, parseIntFlag } from './run.js';
+import { runAction, parseIntFlag, confirmDestructive } from './run.js';
 
 /** Single-container lifecycle subcommands: `docker <action> <id>`. */
 const CONTAINER_ACTIONS = [
@@ -98,5 +99,21 @@ export function registerDockerCommands(
     .description('Update every container that has an available image update.')
     .action(async function (this: Command) {
       await runAction(getGlobals(this), (client) => updateAllContainers(client));
+    });
+
+  docker
+    .command('remove')
+    .description('Remove a container, optionally its image. (destructive)')
+    .argument('<id>', 'The container id')
+    .option('--with-image', 'Also remove the backing image')
+    .option('--yes', 'Confirm this destructive operation')
+    .action(async function (this: Command, id: string) {
+      const opts = this.opts<{ withImage?: boolean; yes?: boolean }>();
+      const withImage = opts.withImage === true;
+      if (
+        !confirmDestructive(`remove container ${id}${withImage ? ' and its image' : ''}`, opts.yes)
+      )
+        return;
+      await runAction(getGlobals(this), (client) => removeContainer(client, id, withImage));
     });
 }

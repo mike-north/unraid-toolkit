@@ -25,6 +25,9 @@ import type {
   StopVmMutation,
   PauseVmMutation,
   ResumeVmMutation,
+  ForceStopVmMutation,
+  RebootVmMutation,
+  ResetVmMutation,
 } from '../unraid/generated.js';
 
 /** A virtual machine (libvirt domain) and its current state. */
@@ -58,12 +61,15 @@ export async function listVms(
   }
 }
 
+/** Every VM lifecycle action, safe (Phase 2) and destructive (Phase 3). */
+export type VmAction = 'start' | 'stop' | 'pause' | 'resume' | 'forceStop' | 'reboot' | 'reset';
+
 /** A virtual-machine lifecycle action and whether the hypervisor accepted it. */
 export interface VmActionResult {
   /** The VM id the action targeted. */
   readonly id: string;
   /** The lifecycle action requested. */
-  readonly action: 'start' | 'stop' | 'pause' | 'resume';
+  readonly action: VmAction;
   /** Whether the hypervisor accepted the request. */
   readonly accepted: boolean;
 }
@@ -71,7 +77,7 @@ export interface VmActionResult {
 /** Run a VM lifecycle mutation and wrap it in the result envelope. */
 async function execVmAction(
   id: string,
-  action: VmActionResult['action'],
+  action: VmAction,
   run: () => Promise<boolean>,
 ): Promise<UnraidResult<VmActionResult>> {
   try {
@@ -155,5 +161,70 @@ export async function resumeVm(
   return execVmAction(id, 'resume', async () => {
     const data = await client.request<ResumeVmMutation>(RESUME_VM_MUTATION, { id });
     return data.vm.resume;
+  });
+}
+
+// --- Phase 3: destructive VM control ------------------------------------------
+
+const FORCE_STOP_VM_MUTATION = gql`
+  mutation ForceStopVm($id: PrefixedID!) {
+    vm {
+      forceStop(id: $id)
+    }
+  }
+`;
+
+/**
+ * Force-stop a virtual machine (ungraceful power-off). Destructive — risks data
+ * loss in the guest. Approval-gated.
+ */
+export async function forceStopVm(
+  client: UnraidClient,
+  id: string,
+): Promise<UnraidResult<VmActionResult>> {
+  return execVmAction(id, 'forceStop', async () => {
+    const data = await client.request<ForceStopVmMutation>(FORCE_STOP_VM_MUTATION, { id });
+    return data.vm.forceStop;
+  });
+}
+
+const REBOOT_VM_MUTATION = gql`
+  mutation RebootVm($id: PrefixedID!) {
+    vm {
+      reboot(id: $id)
+    }
+  }
+`;
+
+/** Reboot a virtual machine. Destructive; approval-gated. */
+export async function rebootVm(
+  client: UnraidClient,
+  id: string,
+): Promise<UnraidResult<VmActionResult>> {
+  return execVmAction(id, 'reboot', async () => {
+    const data = await client.request<RebootVmMutation>(REBOOT_VM_MUTATION, { id });
+    return data.vm.reboot;
+  });
+}
+
+const RESET_VM_MUTATION = gql`
+  mutation ResetVm($id: PrefixedID!) {
+    vm {
+      reset(id: $id)
+    }
+  }
+`;
+
+/**
+ * Reset a virtual machine (hard reset, equivalent to the reset button).
+ * Destructive — risks data loss in the guest. Approval-gated.
+ */
+export async function resetVm(
+  client: UnraidClient,
+  id: string,
+): Promise<UnraidResult<VmActionResult>> {
+  return execVmAction(id, 'reset', async () => {
+    const data = await client.request<ResetVmMutation>(RESET_VM_MUTATION, { id });
+    return data.vm.reset;
   });
 }

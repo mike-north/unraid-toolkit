@@ -3416,6 +3416,63 @@ export type GetParityHistoryQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetParityHistoryQuery = { parityHistory: Array<{ date: string | null, duration: number | null, speed: string | null, status: ParityCheckStatus, errors: number | null, progress: number | null, correcting: boolean | null, paused: boolean | null, running: boolean | null }> };
 
+export type SetArrayStateMutationVariables = Exact<{
+  input: ArrayStateInput;
+}>;
+
+
+export type SetArrayStateMutation = { array: { setState: { state: ArrayState, capacity: { kilobytes: { free: string, used: string, total: string } } } } };
+
+export type AddDiskToArrayMutationVariables = Exact<{
+  input: ArrayDiskInput;
+}>;
+
+
+export type AddDiskToArrayMutation = { array: { addDiskToArray: { state: ArrayState } } };
+
+export type RemoveDiskFromArrayMutationVariables = Exact<{
+  input: ArrayDiskInput;
+}>;
+
+
+export type RemoveDiskFromArrayMutation = { array: { removeDiskFromArray: { state: ArrayState } } };
+
+export type MountArrayDiskMutationVariables = Exact<{
+  id: Scalars['PrefixedID']['input'];
+}>;
+
+
+export type MountArrayDiskMutation = { array: { mountArrayDisk: { id: string, name: string | null, status: ArrayDiskStatus | null } } };
+
+export type UnmountArrayDiskMutationVariables = Exact<{
+  id: Scalars['PrefixedID']['input'];
+}>;
+
+
+export type UnmountArrayDiskMutation = { array: { unmountArrayDisk: { id: string, name: string | null, status: ArrayDiskStatus | null } } };
+
+export type StartParityCheckMutationVariables = Exact<{
+  correct: Scalars['Boolean']['input'];
+}>;
+
+
+export type StartParityCheckMutation = { parityCheck: { start: unknown } };
+
+export type PauseParityCheckMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PauseParityCheckMutation = { parityCheck: { pause: unknown } };
+
+export type ResumeParityCheckMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ResumeParityCheckMutation = { parityCheck: { resume: unknown } };
+
+export type CancelParityCheckMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CancelParityCheckMutation = { parityCheck: { cancel: unknown } };
+
 export type ListDisksQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -3486,6 +3543,14 @@ export type UpdateAllContainersMutationVariables = Exact<{ [key: string]: never;
 
 
 export type UpdateAllContainersMutation = { docker: { updateAllContainers: Array<{ id: string, names: Array<string>, image: string, state: ContainerState, status: string }> } };
+
+export type RemoveContainerMutationVariables = Exact<{
+  id: Scalars['PrefixedID']['input'];
+  withImage: InputMaybe<Scalars['Boolean']['input']>;
+}>;
+
+
+export type RemoveContainerMutation = { docker: { removeContainer: boolean } };
 
 export type ListNotificationsQueryVariables = Exact<{
   filter: NotificationFilter;
@@ -3572,3 +3637,24 @@ export type ResumeVmMutationVariables = Exact<{
 
 
 export type ResumeVmMutation = { vm: { resume: boolean } };
+
+export type ForceStopVmMutationVariables = Exact<{
+  id: Scalars['PrefixedID']['input'];
+}>;
+
+
+export type ForceStopVmMutation = { vm: { forceStop: boolean } };
+
+export type RebootVmMutationVariables = Exact<{
+  id: Scalars['PrefixedID']['input'];
+}>;
+
+
+export type RebootVmMutation = { vm: { reboot: boolean } };
+
+export type ResetVmMutationVariables = Exact<{
+  id: Scalars['PrefixedID']['input'];
+}>;
+
+
+export type ResetVmMutation = { vm: { reset: boolean } };

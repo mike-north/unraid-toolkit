@@ -31,8 +31,22 @@ export {
 export {
   getArrayStatus,
   getParityHistory,
+  setArrayState,
+  addDiskToArray,
+  removeDiskFromArray,
+  mountArrayDisk,
+  unmountArrayDisk,
+  startParityCheck,
+  pauseParityCheck,
+  resumeParityCheck,
+  cancelParityCheck,
   type ArrayStatus,
   type ParityHistoryEntry,
+  type ArrayMutationResult,
+  type ArrayDiskChangeResult,
+  type ArrayDiskMutationResult,
+  type ParityAction,
+  type ParityActionResult,
 } from './operations/array.js';
 
 // Disks
@@ -50,6 +64,7 @@ export {
   unpauseContainer,
   updateContainer,
   updateAllContainers,
+  removeContainer,
   type DockerContainerSummary,
   type DockerContainerDetail,
   type ContainerLogs,
@@ -57,6 +72,7 @@ export {
   type ContainerLogsParams,
   type ContainerUpdateStatus,
   type DockerContainerState,
+  type RemoveContainerResult,
 } from './operations/docker.js';
 
 // VMs
@@ -66,7 +82,11 @@ export {
   stopVm,
   pauseVm,
   resumeVm,
+  forceStopVm,
+  rebootVm,
+  resetVm,
   type VmSummary,
+  type VmAction,
   type VmActionResult,
 } from './operations/vm.js';
 

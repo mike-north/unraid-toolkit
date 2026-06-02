@@ -25,3 +25,16 @@ export const SAFE_WRITE_ANNOTATIONS = {
   idempotentHint: false,
   openWorldHint: true,
 } as const;
+
+/**
+ * Annotations for a Phase 3 destructive control tool — an irreversible or
+ * high-risk write (array stop, disk remove, container remove, force-stop/reset).
+ * Carries `destructiveHint: true`; the runtime additionally gates these behind
+ * the Layer-1 policy floor and Layer-2 human approval.
+ */
+export const DESTRUCTIVE_ANNOTATIONS = {
+  readOnlyHint: false,
+  destructiveHint: true,
+  idempotentHint: false,
+  openWorldHint: true,
+} as const;
