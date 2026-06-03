@@ -94,14 +94,23 @@ describe('safe-write command surface', () => {
     ['docker', 'pause'],
     ['docker', 'unpause'],
     ['docker', 'update'],
+    ['docker', 'update-all'],
     ['vm', 'start'],
     ['vm', 'stop'],
     ['vm', 'pause'],
     ['vm', 'resume'],
     ['parity', 'pause'],
     ['parity', 'resume'],
+    ['notifications', 'create'],
+    ['notifications', 'archive'],
+    ['notifications', 'unarchive'],
   ] as const)('%s %s is registered without a --yes gate', (g, s) => {
     expect(longFlags(sub(g, s))).not.toContain('--yes');
+  });
+
+  it('notifications archive/unarchive take an <id> argument', () => {
+    expect(argNames(sub('notifications', 'archive'))).toContain('id');
+    expect(argNames(sub('notifications', 'unarchive'))).toContain('id');
   });
 
   it('docker lifecycle subcommands take an <id> argument', () => {
