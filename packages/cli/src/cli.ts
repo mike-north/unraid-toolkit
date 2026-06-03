@@ -23,7 +23,12 @@ import { registerUpsCommands } from './commands/ups.js';
 export interface GlobalOptions {
   url?: string | undefined;
   apiKey?: string | undefined;
-  insecure: boolean;
+  /**
+   * Skip TLS verification. `true` when `--insecure` is passed, otherwise
+   * `undefined` so the SDK falls through to `UNRAID_TLS_SKIP_VERIFY`. Never a
+   * concrete `false`, which would shadow the env var.
+   */
+  insecure?: boolean | undefined;
   json: boolean;
 }
 
@@ -31,11 +36,27 @@ export interface GlobalOptions {
  * Raw option bag returned by `commander`'s `.optsWithGlobals()`.
  * All fields are optional because Commander omits absent flags entirely.
  */
-interface RawGlobalOpts {
+export interface RawGlobalOpts {
   url?: string | undefined;
   apiKey?: string | undefined;
   insecure?: boolean | undefined;
   human?: boolean | undefined;
+}
+
+/**
+ * Map Commander's raw option bag to resolved {@link GlobalOptions}.
+ *
+ * `insecure` becomes `true` only when `--insecure` is present, otherwise
+ * `undefined` — never a concrete `false` — so the SDK's connection resolver can
+ * fall through to `UNRAID_TLS_SKIP_VERIFY` instead of being shadowed.
+ */
+export function resolveGlobalOptions(raw: RawGlobalOpts): GlobalOptions {
+  return {
+    url: raw.url,
+    apiKey: raw.apiKey,
+    insecure: raw.insecure === true ? true : undefined,
+    json: raw.human !== true,
+  };
 }
 
 /**
@@ -52,7 +73,10 @@ export function createCli(): Command {
     .version('0.1.0')
     .option('--url <url>', 'Unraid GraphQL endpoint (env: UNRAID_API_URL)')
     .option('--api-key <key>', 'Unraid API key (env: UNRAID_API_KEY)')
-    .option('--insecure', 'Skip TLS verification for self-signed certs', false)
+    .option(
+      '--insecure',
+      'Skip TLS verification for self-signed certs (env: UNRAID_TLS_SKIP_VERIFY)',
+    )
     .option('--json', 'Output JSON', true)
     .option('--human', 'Output human-readable text');
 
@@ -61,13 +85,7 @@ export function createCli(): Command {
    * inside an action handler. Reads root-program opts via a closure over `program`.
    */
   function getGlobals(_cmd: Command): GlobalOptions {
-    const raw = program.opts<RawGlobalOpts>();
-    return {
-      url: raw.url,
-      apiKey: raw.apiKey,
-      insecure: raw.insecure === true,
-      json: raw.human !== true,
-    };
+    return resolveGlobalOptions(program.opts<RawGlobalOpts>());
   }
 
   registerSystemCommands(program, getGlobals);
