@@ -3,7 +3,7 @@
  */
 
 import type { Command } from 'commander';
-import { getUpsStatus } from '@unraid-cli/sdk';
+import { getUpsStatus } from '@unraid-toolkit/sdk';
 import type { GlobalOptions } from '../cli.js';
 import { runAction, parseIntFlag } from './run.js';
 

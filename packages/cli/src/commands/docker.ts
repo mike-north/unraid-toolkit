@@ -15,7 +15,7 @@ import {
   updateContainer,
   updateAllContainers,
   removeContainer,
-} from '@unraid-cli/sdk';
+} from '@unraid-toolkit/sdk';
 import type { GlobalOptions } from '../cli.js';
 import { runAction, parseIntFlag, confirmDestructive } from './run.js';
 

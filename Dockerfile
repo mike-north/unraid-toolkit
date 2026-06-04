@@ -28,7 +28,7 @@ COPY patches/ ./patches/
 COPY packages/sdk/package.json packages/sdk/package.json
 COPY packages/mcp/package.json packages/mcp/package.json
 COPY packages/cli/package.json packages/cli/package.json
-COPY packages/unraid-cli/package.json packages/unraid-cli/package.json
+COPY packages/unraid-toolkit/package.json packages/unraid-toolkit/package.json
 
 RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
     pnpm config set store-dir /pnpm/store && \
@@ -43,7 +43,7 @@ RUN pnpm build
 # the built `dist` (per the package's `files`) and resolves workspace:* deps.
 # `--legacy` is required because the workspace does not set
 # inject-workspace-packages (pnpm v10 otherwise refuses to deploy).
-RUN pnpm --filter @unraid-cli/mcp --legacy deploy --prod /app
+RUN pnpm --filter @unraid-toolkit/mcp --legacy deploy --prod /app
 
 # ------------------------------------------------------------------------------
 FROM node:24-slim AS runtime

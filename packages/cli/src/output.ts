@@ -3,10 +3,10 @@
  *
  * This module owns the single decision point between JSON and human-readable output.
  * It contains no business logic; it only adapts an {@link UnraidResult} envelope into
- * text. All domain knowledge stays in `@unraid-cli/sdk`.
+ * text. All domain knowledge stays in `@unraid-toolkit/sdk`.
  */
 
-import type { UnraidResult } from '@unraid-cli/sdk';
+import type { UnraidResult } from '@unraid-toolkit/sdk';
 
 /**
  * Write a {@link UnraidResult} to stdout (success) or stderr (failure).

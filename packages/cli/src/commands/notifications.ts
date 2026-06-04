@@ -11,7 +11,7 @@ import {
   unarchiveNotification,
   type ListNotificationsParams,
   type NewNotification,
-} from '@unraid-cli/sdk';
+} from '@unraid-toolkit/sdk';
 import type { GlobalOptions } from '../cli.js';
 import { runAction, parseIntFlag } from './run.js';
 

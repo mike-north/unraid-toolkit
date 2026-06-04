@@ -1,6 +1,6 @@
 ---
-'@unraid-cli/cli': patch
-'unraid-cli': patch
+'@unraid-toolkit/cli': patch
+'unraid-toolkit': patch
 ---
 
 Fix the CLI ignoring `UNRAID_TLS_SKIP_VERIFY` unless `--insecure` was passed.

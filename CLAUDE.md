@@ -12,12 +12,12 @@ The design + phased roadmap lives in the approved plan at `~/.claude/plans/i-wan
 
 pnpm workspace + TypeScript **project references** (composite, `tsc --build`). Dependency direction is strictly **wrappers → SDK**; never the reverse.
 
-| Package (dir)         | Name              | Role                                                                                                          |
-| --------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------- |
-| `packages/sdk`        | `@unraid-cli/sdk` | **Core.** GraphQL client, connection config/auth, validation, domain ops, structured errors, result envelope. |
-| `packages/mcp`        | `@unraid-cli/mcp` | MCP server (bin `unraid-mcp`). Thin adapter: SDK ops → MCP tools.                                             |
-| `packages/cli`        | `@unraid-cli/cli` | Commander CLI (bin `unraid`). Thin adapter: flags → SDK ops → stdout.                                         |
-| `packages/unraid-cli` | `unraid-cli`      | Umbrella: re-exports all three; ships the `unraid` binary.                                                    |
+| Package (dir)             | Name                  | Role                                                                                                          |
+| ------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `packages/sdk`            | `@unraid-toolkit/sdk` | **Core.** GraphQL client, connection config/auth, validation, domain ops, structured errors, result envelope. |
+| `packages/mcp`            | `@unraid-toolkit/mcp` | MCP server (bin `unraid-mcp`). Thin adapter: SDK ops → MCP tools.                                             |
+| `packages/cli`            | `@unraid-toolkit/cli` | Commander CLI (bin `unraid`). Thin adapter: flags → SDK ops → stdout.                                         |
+| `packages/unraid-toolkit` | `unraid-toolkit`      | Umbrella: re-exports all three; ships the `unraid` binary.                                                    |
 
 Internal deps use `workspace:*` (enforced by syncpack). Each package `tsconfig.json` extends `tsconfig.base.json` and lists `references` to its dependency packages.
 
@@ -41,8 +41,8 @@ Package manager is **pnpm**. Use `pnpm exec`, never `npx`.
 | Lint / fix                  | `pnpm lint` / `pnpm lint:fix`                                       |
 | Format / check              | `pnpm format` / `pnpm format:check`                                 |
 | Test all                    | `pnpm test`                                                         |
-| Test one package            | `pnpm -F @unraid-cli/sdk test`                                      |
-| Single test by name         | `pnpm -F @unraid-cli/sdk exec vitest run -t "<name>"`               |
+| Test one package            | `pnpm -F @unraid-toolkit/sdk test`                                  |
+| Single test by name         | `pnpm -F @unraid-toolkit/sdk exec vitest run -t "<name>"`           |
 | Dep consistency / dead code | `pnpm syncpack:check` / `pnpm knip`                                 |
 | Record a release            | `pnpm changeset`                                                    |
 
@@ -50,7 +50,7 @@ Package manager is **pnpm**. Use `pnpm exec`, never `npx`.
 
 - **Do NOT set `esModuleInterop: false`.** `module: NodeNext` implies `esModuleInterop: true`, which is required to compile zod 4's shipped `.d.cts` declarations under `skipLibCheck:false`. The base config omits the flag (inherits the NodeNext default). Forcing it false breaks the build with ~50 zod TS1259 errors.
 - **Do NOT enable `skipLibCheck` or disable `exactOptionalPropertyTypes`.** The official `@modelcontextprotocol/sdk` ships `streamableHttp.d.ts` with accessor types incompatible with strict checking; this is fixed by a committed **pnpm patch** (`patches/@modelcontextprotocol__sdk@1.29.0.patch`, wired via `pnpm-workspace.yaml`) that narrows the transport getters. **Bumping the SDK version** will likely break the patch — re-create with `pnpm patch @modelcontextprotocol/sdk@<version>` (narrow `get sessionId/onclose/onerror/onmessage`, drop `| undefined`) in both `dist/esm` and `dist/cjs`.
-- **`web-globals.d.ts`** declares the global `HeadersInit` type. It must exist in **every package whose compilation sees** the fetch-typed third-party declarations: `packages/sdk` (graphql-request), `packages/mcp` (MCP SDK transport), and `packages/unraid-cli` (transitively, via re-exporting `@unraid-cli/mcp`'s `McpServer`-typed API). Don't delete these — without them, `skipLibCheck:false` fails.
+- **`web-globals.d.ts`** declares the global `HeadersInit` type. It must exist in **every package whose compilation sees** the fetch-typed third-party declarations: `packages/sdk` (graphql-request), `packages/mcp` (MCP SDK transport), and `packages/unraid-toolkit` (transitively, via re-exporting `@unraid-toolkit/mcp`'s `McpServer`-typed API). Don't delete these — without them, `skipLibCheck:false` fails.
 - **NodeNext + `verbatimModuleSyntax`**: relative imports MUST carry a `.js` extension; type-only imports MUST use `import type`.
 - **Zod 4** (not 3): use `z.enum`; customize required-field messages with `z.string({ error: '...' })` (the bare default emits "expected string, received undefined" for missing fields).
 - **MCP/CLI entry files guard `main()`** behind an `import.meta.url` main-module check so the umbrella can re-export them without side effects.
@@ -58,4 +58,4 @@ Package manager is **pnpm**. Use `pnpm exec`, never `npx`.
 ## Conventions
 
 - Tests: Vitest. Include negative paths; every bug fix gets a regression test. Use fixed date constants / `vi.useFakeTimers()` — never `new Date()` in test data. When a test depends on the Unraid GraphQL schema, add an `@see` link to the authoritative docs.
-- Releases via **Changesets** (`access: public`). Internal `@unraid-cli/*` deps are pinned to `workspace:*` (syncpack-enforced); `typescript` is pinned to a minor (`~`) because api-extractor expects 5.9.x.
+- Releases via **Changesets** (`access: public`). Internal `@unraid-toolkit/*` deps are pinned to `workspace:*` (syncpack-enforced); `typescript` is pinned to a minor (`~`) because api-extractor expects 5.9.x.

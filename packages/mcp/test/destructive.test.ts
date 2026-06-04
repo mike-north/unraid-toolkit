@@ -8,7 +8,7 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { success, failure, UnraidErrorCode, type UnraidResult } from '@unraid-cli/sdk';
+import { success, failure, UnraidErrorCode, type UnraidResult } from '@unraid-toolkit/sdk';
 import { runDestructive } from '../src/tools/destructive.js';
 import { TokenStore } from '../src/approval.js';
 import type { AuditEntry, AuditLog } from '../src/audit.js';

@@ -1,8 +1,15 @@
 {
-  "name": "@unraid-cli/sdk",
+  "name": "@unraid-toolkit/sdk",
   "version": "0.1.0",
   "description": "Core SDK for the Unraid GraphQL API: typed client, domain operations, and a structured result envelope. No protocol or UI concerns.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mike-north/unraid-cli.git",
+    "directory": "packages/sdk"
+  },
+  "homepage": "https://github.com/mike-north/unraid-cli#readme",
+  "bugs": "https://github.com/mike-north/unraid-cli/issues",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

@@ -1,9 +1,9 @@
 {
-  "name": "unraid-cli-monorepo",
+  "name": "unraid-toolkit-monorepo",
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Monorepo for the unraid-cli toolkit: a core SDK with thin CLI and MCP wrappers over the Unraid GraphQL API",
+  "description": "Monorepo for unraid-toolkit: a core SDK with thin CLI and MCP wrappers over the Unraid GraphQL API",
   "engines": {
     "node": ">=24"
   },
@@ -24,7 +24,7 @@
     "syncpack:fix": "syncpack fix-mismatches",
     "check": "pnpm run codegen:check && pnpm run build && pnpm run lint && pnpm run format:check && pnpm run syncpack:check && pnpm run knip && pnpm run test",
     "changeset": "changeset",
-    "version": "changeset version",
+    "version": "changeset version && pnpm install --lockfile-only",
     "release": "pnpm run build && changeset publish",
     "prepare": "husky"
   },

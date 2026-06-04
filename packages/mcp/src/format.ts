@@ -9,7 +9,7 @@
  */
 
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import type { UnraidResult } from '@unraid-cli/sdk';
+import type { UnraidResult } from '@unraid-toolkit/sdk';
 
 /** Convert an SDK result envelope into an MCP tool result. */
 export function formatResult<T>(result: UnraidResult<T>): CallToolResult {

@@ -3,7 +3,7 @@
  */
 
 import type { Command } from 'commander';
-import { listDisks } from '@unraid-cli/sdk';
+import { listDisks } from '@unraid-toolkit/sdk';
 import type { GlobalOptions } from '../cli.js';
 import { runAction, parseIntFlag } from './run.js';
 

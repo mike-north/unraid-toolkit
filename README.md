@@ -1,4 +1,4 @@
-# unraid-cli
+# unraid-toolkit
 
 [![CI](https://github.com/mike-north/unraid-cli/actions/workflows/ci.yml/badge.svg)](https://github.com/mike-north/unraid-cli/actions/workflows/ci.yml)
 
@@ -11,20 +11,20 @@ A toolkit for observing and controlling an [Unraid](https://unraid.net) server t
 A core SDK holds all the real logic; the CLI and MCP server are thin adapters over it.
 
 ```
-@unraid-cli/sdk   ← core: GraphQL client, auth, validation, domain ops, result envelope
+@unraid-toolkit/sdk   ← core: GraphQL client, auth, validation, domain ops, result envelope
       ▲   ▲
       │   │
-@unraid-cli/cli   @unraid-cli/mcp   ← thin wrappers (Commander CLI / MCP server)
+@unraid-toolkit/cli   @unraid-toolkit/mcp   ← thin wrappers (Commander CLI / MCP server)
       ▲   ▲   ▲
-      └───┴───┴── unraid-cli         ← umbrella: re-exports all three, ships the `unraid` binary
+      └───┴───┴── unraid-toolkit     ← umbrella: re-exports all three, ships the `unraid` binary
 ```
 
-| Package                             | Role                                                                                                                                                                     |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| [`@unraid-cli/sdk`](packages/sdk)   | Core SDK. Owns the GraphQL transport, API-key auth, validation, domain models, structured errors, and the `UnraidResult<T>` result envelope. No protocol or UI concerns. |
-| [`@unraid-cli/cli`](packages/cli)   | Commander-based CLI. Parses flags, calls SDK operations, formats output (JSON / human).                                                                                  |
-| [`@unraid-cli/mcp`](packages/mcp)   | Model Context Protocol server. Exposes SDK operations as MCP tools over stdio / Streamable HTTP.                                                                         |
-| [`unraid-cli`](packages/unraid-cli) | Umbrella package. Re-exports the three above and provides the `unraid` command.                                                                                          |
+| Package                                     | Role                                                                                                                                                                     |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| [`@unraid-toolkit/sdk`](packages/sdk)       | Core SDK. Owns the GraphQL transport, API-key auth, validation, domain models, structured errors, and the `UnraidResult<T>` result envelope. No protocol or UI concerns. |
+| [`@unraid-toolkit/cli`](packages/cli)       | Commander-based CLI. Parses flags, calls SDK operations, formats output (JSON / human).                                                                                  |
+| [`@unraid-toolkit/mcp`](packages/mcp)       | Model Context Protocol server. Exposes SDK operations as MCP tools over stdio / Streamable HTTP.                                                                         |
+| [`unraid-toolkit`](packages/unraid-toolkit) | Umbrella package. Re-exports the three above and provides the `unraid` command.                                                                                          |
 
 The boundary is deliberate: **operations, validation, and error handling live in the SDK once**; each wrapper only adapts input (flags vs. tool schemas) and output (stdout vs. `CallToolResult`). Adding a third interface (e.g. an HTTP API) would be another thin adapter, not a reimplementation.
 
@@ -53,7 +53,7 @@ The MCP server additionally reads runtime settings: `MCP_TRANSPORT` (`stdio`\|`h
 Installing the umbrella package globally provides the `unraid` command:
 
 ```bash
-pnpm add -g unraid-cli
+pnpm add -g unraid-toolkit
 UNRAID_API_URL=https://tower.local/graphql UNRAID_API_KEY=your-key unraid health
 # or pass connection details as flags:
 unraid health --url https://tower.local/graphql --api-key your-key --insecure
@@ -99,7 +99,7 @@ pnpm install         # install workspace (applies the bundled MCP SDK patch)
 pnpm build           # tsc --build across all packages (incremental)
 pnpm check           # build + lint + format:check + syncpack + knip + test
 pnpm test            # run all package tests (vitest)
-pnpm -F @unraid-cli/sdk test   # test a single package
+pnpm -F @unraid-toolkit/sdk test   # test a single package
 pnpm lint            # eslint packages/*/src
 pnpm changeset       # record a release note
 ```

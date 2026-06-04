@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * `@unraid-cli/mcp` — MCP server for the Unraid GraphQL API.
+ * `@unraid-toolkit/mcp` — MCP server for the Unraid GraphQL API.
  *
  * Running this file as a binary starts the server. Importing it as a library
  * exposes {@link buildServer} and config helpers without side effects.
@@ -8,7 +8,7 @@
 
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { createClient, resolveConnectionConfig, type ConnectionConfig } from '@unraid-cli/sdk';
+import { createClient, resolveConnectionConfig, type ConnectionConfig } from '@unraid-toolkit/sdk';
 import { loadMcpConfig, type McpConfig } from './config.js';
 import { createLogger } from './log.js';
 import { createAuditLog } from './audit.js';

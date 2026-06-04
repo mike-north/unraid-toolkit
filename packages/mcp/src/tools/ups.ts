@@ -3,7 +3,7 @@
  */
 
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { getUpsStatus } from '@unraid-cli/sdk';
+import { getUpsStatus } from '@unraid-toolkit/sdk';
 import { formatResult } from '../format.js';
 import { READ_ONLY_ANNOTATIONS } from './annotations.js';
 import { PAGINATION_INPUT } from './pagination.js';

@@ -12,7 +12,7 @@
 
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { UnraidResult } from '@unraid-cli/sdk';
+import type { UnraidResult } from '@unraid-toolkit/sdk';
 import { formatResult } from '../format.js';
 import { layer1Block } from './policy.js';
 import { resolveApproval } from '../approval.js';

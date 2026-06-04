@@ -1,8 +1,8 @@
 ---
-'@unraid-cli/sdk': patch
-'@unraid-cli/mcp': patch
-'@unraid-cli/cli': patch
-'unraid-cli': patch
+'@unraid-toolkit/sdk': patch
+'@unraid-toolkit/mcp': patch
+'@unraid-toolkit/cli': patch
+'unraid-toolkit': patch
 ---
 
 `createNotification` now returns a usable notification `id`.

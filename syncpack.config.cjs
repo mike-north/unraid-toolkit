@@ -4,7 +4,7 @@ module.exports = {
     {
       label: 'Use workspace protocol for internal packages',
       packages: ['**'],
-      dependencies: ['@unraid-cli/*'],
+      dependencies: ['@unraid-toolkit/*'],
       dependencyTypes: ['prod', 'dev'],
       pinVersion: 'workspace:*',
     },

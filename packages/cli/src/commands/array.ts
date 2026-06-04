@@ -15,7 +15,7 @@ import {
   pauseParityCheck,
   resumeParityCheck,
   cancelParityCheck,
-} from '@unraid-cli/sdk';
+} from '@unraid-toolkit/sdk';
 import type { GlobalOptions } from '../cli.js';
 import { runAction, parseIntFlag, confirmDestructive } from './run.js';
 

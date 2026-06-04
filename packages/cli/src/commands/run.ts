@@ -13,7 +13,7 @@ import {
   createClient,
   type UnraidClient,
   type UnraidResult,
-} from '@unraid-cli/sdk';
+} from '@unraid-toolkit/sdk';
 import type { GlobalOptions } from '../cli.js';
 import { output } from '../output.js';
 

@@ -19,7 +19,7 @@ import {
   type UnraidClient,
   type UnraidResult,
   type DockerContainerState,
-} from '@unraid-cli/sdk';
+} from '@unraid-toolkit/sdk';
 import { formatResult } from '../format.js';
 import {
   READ_ONLY_ANNOTATIONS,

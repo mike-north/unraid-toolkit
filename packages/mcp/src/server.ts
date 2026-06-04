@@ -4,7 +4,7 @@
  */
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { UnraidClient } from '@unraid-cli/sdk';
+import type { UnraidClient } from '@unraid-toolkit/sdk';
 import type { McpConfig } from './config.js';
 import type { Logger } from './log.js';
 import type { AuditLog } from './audit.js';

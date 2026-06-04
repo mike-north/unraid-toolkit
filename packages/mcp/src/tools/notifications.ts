@@ -10,7 +10,7 @@ import {
   createNotification,
   archiveNotification,
   unarchiveNotification,
-} from '@unraid-cli/sdk';
+} from '@unraid-toolkit/sdk';
 import { formatResult } from '../format.js';
 import { READ_ONLY_ANNOTATIONS, SAFE_WRITE_ANNOTATIONS } from './annotations.js';
 import { PAGINATION_INPUT } from './pagination.js';

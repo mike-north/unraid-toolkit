@@ -1,7 +1,7 @@
 /**
  * Ambient declaration for the fetch-API `HeadersInit` type.
  *
- * This umbrella re-exports `@unraid-cli/mcp`, whose public types transitively
+ * This umbrella re-exports `@unraid-toolkit/mcp`, whose public types transitively
  * reference `@modelcontextprotocol/sdk`'s declarations that use the global
  * `HeadersInit`. We target a Node lib (`ES2024`) without `DOM`, and
  * `@types/node` does not expose `HeadersInit` as a global, so we declare it

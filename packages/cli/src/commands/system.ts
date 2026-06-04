@@ -3,11 +3,11 @@
  *
  * Registers the top-level `health` probe plus the `system` subcommands
  * (`info`, `metrics`). Contains no business logic — it delegates to
- * `@unraid-cli/sdk` and renders results via the shared {@link runAction} helper.
+ * `@unraid-toolkit/sdk` and renders results via the shared {@link runAction} helper.
  */
 
 import type { Command } from 'commander';
-import { getHealth, getSystemInfo, getSystemMetrics } from '@unraid-cli/sdk';
+import { getHealth, getSystemInfo, getSystemMetrics } from '@unraid-toolkit/sdk';
 import type { GlobalOptions } from '../cli.js';
 import { runAction } from './run.js';
 

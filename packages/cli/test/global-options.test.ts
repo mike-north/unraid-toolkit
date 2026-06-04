@@ -11,7 +11,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { resolveConnectionConfig } from '@unraid-cli/sdk';
+import { resolveConnectionConfig } from '@unraid-toolkit/sdk';
 import { resolveGlobalOptions } from '../src/cli.js';
 
 const ENDPOINT = { UNRAID_API_URL: 'https://tower.local/graphql', UNRAID_API_KEY: 'k' };

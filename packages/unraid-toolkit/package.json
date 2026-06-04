@@ -1,12 +1,12 @@
 {
-  "name": "@unraid-toolkit/cli",
+  "name": "unraid-toolkit",
   "version": "0.1.0",
-  "description": "Command-line interface for the Unraid GraphQL API, built on @unraid-toolkit/sdk.",
+  "description": "Unraid toolkit umbrella — re-exports the SDK, CLI, and MCP server, and ships the `unraid` command.",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mike-north/unraid-cli.git",
-    "directory": "packages/cli"
+    "directory": "packages/unraid-toolkit"
   },
   "homepage": "https://github.com/mike-north/unraid-cli#readme",
   "bugs": "https://github.com/mike-north/unraid-cli/issues",
@@ -14,7 +14,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "unraid": "./dist/index.js"
+    "unraid": "./dist/bin.js"
   },
   "files": [
     "dist"
@@ -23,7 +23,8 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@unraid-toolkit/sdk": "workspace:*",
-    "commander": "^14.0.3"
+    "@unraid-toolkit/cli": "workspace:*",
+    "@unraid-toolkit/mcp": "workspace:*",
+    "@unraid-toolkit/sdk": "workspace:*"
   }
 }

@@ -1,11 +1,13 @@
 name: Publish Docker image
 
-# Build and push the unraid-mcp image to Docker Hub on version tags. The CI
-# gate (ci.yml) still guards every PR and push to main; this workflow only runs
-# for releases (tags like v0.1.0).
+# Build and push the unraid-mcp image to Docker Hub when the MCP package is
+# released. Changesets tags each published package as `<name>@<version>`, so a
+# release of @unraid-toolkit/mcp creates a tag like `@unraid-toolkit/mcp@0.1.0`.
+# The CI gate (ci.yml) still guards every PR and push to main; this workflow
+# only runs for MCP releases.
 on:
   push:
-    tags: ['v*']
+    tags: ['@unraid-toolkit/mcp@*']
 
 permissions:
   contents: read
@@ -37,11 +39,13 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.IMAGE }}
-          # Semver tags from the git tag, plus `latest` for the newest release.
+          # Extract the version from the `@unraid-toolkit/mcp@X.Y.Z` git tag
+          # (metadata-action's type=semver can't parse the scoped tag format),
+          # plus `latest` for the newest release.
           tags: |
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
+            type=match,pattern=@(\d+\.\d+\.\d+)$,group=1
+            type=match,pattern=@(\d+\.\d+)\.\d+$,group=1
+            type=match,pattern=@(\d+)\.\d+\.\d+$,group=1
             type=raw,value=latest
 
       - name: Build and push (amd64 + arm64)

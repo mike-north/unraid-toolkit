@@ -1,5 +1,5 @@
 /**
- * `@unraid-cli/sdk` — the core SDK for the Unraid GraphQL API.
+ * `@unraid-toolkit/sdk` — the core SDK for the Unraid GraphQL API.
  *
  * Owns the transport, authentication, validation, domain models, structured
  * errors, and the result envelope. The CLI and MCP wrappers are thin adapters

@@ -4,6 +4,6 @@
     { "path": "packages/sdk" },
     { "path": "packages/mcp" },
     { "path": "packages/cli" },
-    { "path": "packages/unraid-cli" }
+    { "path": "packages/unraid-toolkit" }
   ]
 }

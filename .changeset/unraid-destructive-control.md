@@ -1,8 +1,8 @@
 ---
-'@unraid-cli/sdk': minor
-'@unraid-cli/mcp': minor
-'@unraid-cli/cli': minor
-'unraid-cli': minor
+'@unraid-toolkit/sdk': minor
+'@unraid-toolkit/mcp': minor
+'@unraid-toolkit/cli': minor
+'unraid-toolkit': minor
 ---
 
 Add gated destructive control operations with layered human-in-the-loop approval.

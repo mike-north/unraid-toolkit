@@ -1,0 +1,59 @@
+name: Release
+
+# Changesets-driven release. On every push to main this either:
+#   - opens/updates a "Version Packages" PR (when unreleased changesets exist), or
+#   - publishes the bumped packages to npm (once that PR is merged and the
+#     changesets are consumed).
+# The CI gate (ci.yml) still guards every PR and push; this workflow only
+# versions and publishes.
+on:
+  push:
+    branches: [main]
+
+# Avoid overlapping releases; do NOT cancel an in-progress publish.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write # push the version commit/tags and the release PR branch
+  pull-requests: write # open/update the "Version Packages" PR
+  id-token: write # npm provenance (OIDC)
+
+jobs:
+  release:
+    name: version or publish
+    runs-on: ubuntu-latest
+    environment: npm-publish
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create Release PR or publish to npm
+        uses: changesets/action@v1
+        with:
+          # `version` bumps package.json versions, writes changelogs, and
+          # refreshes the lockfile; `publish` builds and runs `changeset publish`.
+          version: pnpm run version
+          publish: pnpm run release
+          title: 'chore: version packages'
+          commit: 'chore: version packages'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN }}
+          # Generate npm provenance attestations (requires a public repo +
+          # id-token: write above). Drop this line if publishing fails on it.
+          NPM_CONFIG_PROVENANCE: 'true'

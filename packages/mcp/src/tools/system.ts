@@ -4,7 +4,7 @@
  */
 
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { getHealth, getSystemInfo, getSystemMetrics } from '@unraid-cli/sdk';
+import { getHealth, getSystemInfo, getSystemMetrics } from '@unraid-toolkit/sdk';
 import { formatResult } from '../format.js';
 import { READ_ONLY_ANNOTATIONS } from './annotations.js';
 import type { ServerContext } from '../server.js';

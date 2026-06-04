@@ -67,7 +67,7 @@ importers:
 
   packages/cli:
     dependencies:
-      '@unraid-cli/sdk':
+      '@unraid-toolkit/sdk':
         specifier: workspace:*
         version: link:../sdk
       commander:
@@ -79,7 +79,7 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: ^1.29.0
         version: 1.29.0(patch_hash=5621e59c875bb8156d7ec43bfb97250428c04fc9b0472ea75f02f98941a19e71)(zod@4.4.3)
-      '@unraid-cli/sdk':
+      '@unraid-toolkit/sdk':
         specifier: workspace:*
         version: link:../sdk
       express:
@@ -112,15 +112,15 @@ importers:
         specifier: ^2.7.0
         version: 2.14.6(@types/node@24.12.4)(typescript@5.9.3)
 
-  packages/unraid-cli:
+  packages/unraid-toolkit:
     dependencies:
-      '@unraid-cli/cli':
+      '@unraid-toolkit/cli':
         specifier: workspace:*
         version: link:../cli
-      '@unraid-cli/mcp':
+      '@unraid-toolkit/mcp':
         specifier: workspace:*
         version: link:../mcp
-      '@unraid-cli/sdk':
+      '@unraid-toolkit/sdk':
         specifier: workspace:*
         version: link:../sdk
 
