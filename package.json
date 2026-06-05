@@ -22,13 +22,17 @@
     "knip": "knip",
     "syncpack:check": "syncpack lint",
     "syncpack:fix": "syncpack fix-mismatches",
-    "check": "pnpm run codegen:check && pnpm run build && pnpm run lint && pnpm run format:check && pnpm run syncpack:check && pnpm run knip && pnpm run test",
+    "marketplace:build": "aipm build",
+    "marketplace:validate": "aipm validate",
+    "check": "pnpm run codegen:check && pnpm run build && pnpm run lint && pnpm run format:check && pnpm run syncpack:check && pnpm run knip && pnpm run marketplace:validate && pnpm run test",
     "changeset": "changeset",
     "version": "changeset version",
     "release": "pnpm run build && changeset publish",
     "prepare": "husky"
   },
   "devDependencies": {
+    "@ai-plugin-marketplace/cli": "^0.2.0",
+    "@ai-plugin-marketplace/core": "^0.3.0",
     "@changesets/cli": "^2.29.8",
     "@eslint/js": "^10.0.1",
     "@graphql-codegen/cli": "^5.0.7",

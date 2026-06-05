@@ -13,6 +13,12 @@ importers:
 
   .:
     devDependencies:
+      '@ai-plugin-marketplace/cli':
+        specifier: ^0.2.0
+        version: 0.2.0
+      '@ai-plugin-marketplace/core':
+        specifier: ^0.3.0
+        version: 0.3.0
       '@changesets/cli':
         specifier: ^2.29.8
         version: 2.31.0(@types/node@24.12.4)
@@ -125,6 +131,15 @@ importers:
         version: link:../sdk
 
 packages:
+
+  '@ai-plugin-marketplace/cli@0.2.0':
+    resolution: {integrity: sha512-6jPbgoiqbJT7fybFdxmOfGMhYsrFEU+W8+27uY2ST1F9xCIECMIFavHz2Kp3hu1FD0TiDlOvZfK8C0yjq7gP7g==}
+    engines: {node: '>=20.0.0'}
+    hasBin: true
+
+  '@ai-plugin-marketplace/core@0.3.0':
+    resolution: {integrity: sha512-9vwc1gqGpeQO4mKIPMTh86T+KywQvGjWRIb73T9wthMZ2jnnH0i6DafYvYpn9p+QzUYMxkjwpwF011FrT61oQg==}
+    engines: {node: '>=20.0.0'}
 
   '@ardatan/relay-compiler@13.0.1':
     resolution: {integrity: sha512-afG3YPwuSA0E5foouZusz5GlXKs74dObv4cuWyLyfKsYFj2r7oGRNB28v18HvwuLSQtQFCi+DpIe0TZkgQDYyg==}
@@ -3314,6 +3329,16 @@ packages:
     resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
 
 snapshots:
+
+  '@ai-plugin-marketplace/cli@0.2.0':
+    dependencies:
+      '@ai-plugin-marketplace/core': 0.3.0
+
+  '@ai-plugin-marketplace/core@0.3.0':
+    dependencies:
+      jiti: 2.7.0
+      yaml: 2.9.0
+      zod: 4.4.3
 
   '@ardatan/relay-compiler@13.0.1(graphql@16.14.0)':
     dependencies:
