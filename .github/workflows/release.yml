@@ -25,6 +25,12 @@ jobs:
     name: version or publish
     runs-on: ubuntu-latest
     environment: npm-publish
+    outputs:
+      # Forwarded from the changesets action so the docker job below can decide
+      # whether (and at what version) to build the unraid-mcp image.
+      published: ${{ steps.changesets.outputs.published }}
+      published-packages: ${{ steps.changesets.outputs.publishedPackages }}
+      mcp-version: ${{ steps.mcp.outputs.version }}
     steps:
       - uses: actions/checkout@v6
 
@@ -42,6 +48,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Create Release PR or publish to npm
+        id: changesets
         uses: changesets/action@v1
         with:
           # `version` bumps package.json versions, writes changelogs, and
@@ -57,3 +64,23 @@ jobs:
           # Generate npm provenance attestations (requires a public repo +
           # id-token: write above). Drop this line if publishing fails on it.
           NPM_CONFIG_PROVENANCE: 'true'
+
+      - name: Extract published MCP version
+        id: mcp
+        if: steps.changesets.outputs.published == 'true'
+        run: |
+          version=$(echo '${{ steps.changesets.outputs.publishedPackages }}' \
+            | jq -r '.[] | select(.name == "@unraid-toolkit/mcp") | .version')
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+
+  # Build the Docker image only when this run actually published @unraid-toolkit/mcp.
+  # Calling the workflow (rather than relying on the pushed tag) sidesteps the
+  # GITHUB_TOKEN-pushed-tags-don't-trigger-workflows limitation.
+  docker:
+    name: publish docker image
+    needs: release
+    if: needs.release.outputs.published == 'true' && needs.release.outputs.mcp-version != ''
+    uses: ./.github/workflows/docker-publish.yml
+    with:
+      version: ${{ needs.release.outputs.mcp-version }}
+    secrets: inherit

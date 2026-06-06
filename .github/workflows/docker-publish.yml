@@ -1,13 +1,26 @@
 name: Publish Docker image
 
-# Build and push the unraid-mcp image to Docker Hub when the MCP package is
-# released. Changesets tags each published package as `<name>@<version>`, so a
-# release of @unraid-toolkit/mcp creates a tag like `@unraid-toolkit/mcp@0.1.0`.
-# The CI gate (ci.yml) still guards every PR and push to main; this workflow
-# only runs for MCP releases.
+# Build and push the unraid-mcp image to Docker Hub for a given MCP version.
+#
+# This workflow does NOT trigger on pushed tags: Changesets pushes its release
+# tags with the default GITHUB_TOKEN, and tags pushed by GITHUB_TOKEN do not
+# trigger `on: push` workflows. Instead it is:
+#   - called by release.yml right after a successful publish that includes
+#     @unraid-toolkit/mcp (workflow_call), and
+#   - runnable by hand for a backfill/rebuild (workflow_dispatch).
 on:
-  push:
-    tags: ['@unraid-toolkit/mcp@*']
+  workflow_call:
+    inputs:
+      version:
+        description: 'MCP package version to tag the image with (e.g. 0.2.0)'
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'MCP package version to tag the image with (e.g. 0.2.0)'
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -39,13 +52,11 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.IMAGE }}
-          # Extract the version from the `@unraid-toolkit/mcp@X.Y.Z` git tag
-          # (metadata-action's type=semver can't parse the scoped tag format),
-          # plus `latest` for the newest release.
+          # Derive semver tags from the supplied version input, plus `latest`.
           tags: |
-            type=match,pattern=@(\d+\.\d+\.\d+)$,group=1
-            type=match,pattern=@(\d+\.\d+)\.\d+$,group=1
-            type=match,pattern=@(\d+)\.\d+\.\d+$,group=1
+            type=semver,pattern={{version}},value=${{ inputs.version }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ inputs.version }}
+            type=semver,pattern={{major}},value=${{ inputs.version }}
             type=raw,value=latest
 
       - name: Build and push (amd64 + arm64)
