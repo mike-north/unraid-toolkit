@@ -6,6 +6,9 @@
  * all SDK interaction happens in command action handlers.
  */
 
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { Command } from 'commander';
 import { registerSystemCommands } from './commands/system.js';
 import { registerArrayCommands } from './commands/array.js';
@@ -60,6 +63,31 @@ export function resolveGlobalOptions(raw: RawGlobalOpts): GlobalOptions {
 }
 
 /**
+ * Read this package's version from its own `package.json` at runtime so the CLI
+ * always reports the actually-installed version. Never hardcode a literal — it
+ * silently drifts from the published release. The compiled module lives at
+ * `dist/cli.js`, so `package.json` is one directory up (the same depth holds for
+ * `src/cli.ts` under vitest).
+ */
+function readPackageVersion(): string {
+  try {
+    const here = dirname(fileURLToPath(import.meta.url));
+    const parsed: unknown = JSON.parse(readFileSync(join(here, '..', 'package.json'), 'utf8'));
+    if (
+      typeof parsed === 'object' &&
+      parsed !== null &&
+      'version' in parsed &&
+      typeof parsed.version === 'string'
+    ) {
+      return parsed.version;
+    }
+    return '0.0.0';
+  } catch {
+    return '0.0.0';
+  }
+}
+
+/**
  * Build and configure the root Commander program for the `unraid` CLI.
  *
  * @returns The configured Commander {@link Command} instance, ready for `.parse()`.
@@ -70,7 +98,7 @@ export function createCli(): Command {
   program
     .name('unraid')
     .description('Unraid CLI — observe and control an Unraid server via its GraphQL API')
-    .version('0.1.0')
+    .version(readPackageVersion())
     .option('--url <url>', 'Unraid GraphQL endpoint (env: UNRAID_API_URL)')
     .option('--api-key <key>', 'Unraid API key (env: UNRAID_API_KEY)')
     .option(
