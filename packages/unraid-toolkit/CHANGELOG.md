@@ -1,5 +1,17 @@
 # unraid-toolkit
 
+## 0.2.1
+
+### Patch Changes
+
+- 66feb67: Report the real package version instead of a hardcoded literal. `unraid --version`
+  and the MCP server's initialize handshake previously returned a stale `0.1.0`
+  regardless of the installed release; both now read the version from their
+  package's `package.json` at runtime.
+- Updated dependencies [66feb67]
+  - @unraid-toolkit/cli@0.2.1
+  - @unraid-toolkit/mcp@0.2.1
+
 ## 0.2.0
 
 ### Minor Changes

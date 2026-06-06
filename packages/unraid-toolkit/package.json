@@ -1,6 +1,6 @@
 {
   "name": "unraid-toolkit",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Unraid toolkit umbrella — re-exports the SDK, CLI, and MCP server, and ships the `unraid` command.",
   "license": "MIT",
   "repository": {
