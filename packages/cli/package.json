@@ -10,6 +10,9 @@
   },
   "homepage": "https://github.com/mike-north/unraid-toolkit#readme",
   "bugs": "https://github.com/mike-north/unraid-toolkit/issues",
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
