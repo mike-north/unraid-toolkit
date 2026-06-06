@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "0.1.0",
+  "mcpServers": {
+    "unraid": {
+      "command": "docker",
+      "args": [
+        "run",
+        "--rm",
+        "-i",
+        "-e",
+        "MCP_TRANSPORT=stdio",
+        "-e",
+        "MCP_READ_ONLY",
+        "-e",
+        "UNRAID_API_URL",
+        "-e",
+        "UNRAID_API_KEY",
+        "-e",
+        "UNRAID_TLS_SKIP_VERIFY",
+        "docker.io/mikenorth/unraid-mcp:latest"
+      ],
+      "env": {
+        "MCP_READ_ONLY": "${MCP_READ_ONLY:-true}",
+        "UNRAID_API_URL": "${UNRAID_API_URL}",
+        "UNRAID_API_KEY": "${UNRAID_API_KEY}",
+        "UNRAID_TLS_SKIP_VERIFY": "${UNRAID_TLS_SKIP_VERIFY:-false}"
+      }
+    }
+  }
+}

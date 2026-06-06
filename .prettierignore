@@ -5,3 +5,10 @@ scratch/
 pnpm-lock.yaml
 **/src/**/generated.ts
 **/*.graphql
+
+# AI plugin marketplace content — governed by `aipm validate`'s freshness
+# check, not Prettier. Covers authored plugin sources and generated registries.
+agent-plugins/
+.claude-plugin/
+.cursor-plugin/
+.agents/
