@@ -8,9 +8,9 @@ import { defineWorkspace } from '@ai-plugin-marketplace/core';
  */
 export default defineWorkspace({
   marketplace: {
-    name: 'unraid-cli',
+    name: 'unraid-toolkit',
     owner: { name: 'Mike North', email: 'michael.l.north@gmail.com' },
     description:
-      'Agent plugins for observing and controlling an Unraid server via the unraid-cli toolkit.',
+      'Agent plugins for observing and controlling an Unraid server via the unraid-toolkit toolkit.',
   },
 });

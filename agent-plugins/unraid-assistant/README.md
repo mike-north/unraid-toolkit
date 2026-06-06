@@ -1,7 +1,7 @@
 # unraid-assistant
 
 An AI assistant plugin that teaches an agent to observe and control an
-[Unraid](https://unraid.net) server through the **unraid-cli** toolkit — either the
+[Unraid](https://unraid.net) server through the **unraid-toolkit** toolkit — either the
 `unraid_*` **MCP tools** or the `unraid` **CLI** — including the read-only / safe-write /
 destructive safety model that gates writes.
 
@@ -17,8 +17,8 @@ The plugin ships:
 
 Install via your host's marketplace flow (this repo is an `aipm` marketplace):
 
-- **Claude Code / Cursor:** `/plugin marketplace add mike-north/unraid-cli`
-- **Codex:** `codex plugin marketplace add mike-north/unraid-cli`
+- **Claude Code / Cursor:** `/plugin marketplace add mike-north/unraid-toolkit`
+- **Codex:** `codex plugin marketplace add mike-north/unraid-toolkit`
 
 ## Configuration
 
@@ -33,7 +33,7 @@ Set these in your environment before using the MCP server (see the skill for ful
 
 The bundled `.mcp.json` launches the server with Docker over stdio. Alternatives the skill
 documents: pointing a client at an MCP server already running on the Unraid box over HTTP, or
-running the `unraid` CLI directly (no MCP).
+running the `unraid` CLI directly (no MCP) — install it with `npm i -g unraid-toolkit`.
 
 ## Targets
 

@@ -8,7 +8,7 @@ export default defineConfig({
   // from this embedded marketplace. See README for details.
   targets: ['claude', 'codex', 'cursor', 'vercel'],
   description:
-    'Teaches an AI agent to observe and control an Unraid server via the unraid-cli MCP tools or the `unraid` CLI, including the read-only / safe-write / destructive safety model.',
+    'Teaches an AI agent to observe and control an Unraid server via the unraid-toolkit MCP tools or the `unraid` CLI, including the read-only / safe-write / destructive safety model.',
   keywords: [
     'unraid',
     'nas',

@@ -1,17 +1,17 @@
 {
-  "name": "unraid-cli",
+  "name": "unraid-toolkit",
   "owner": {
     "name": "Mike North",
     "email": "michael.l.north@gmail.com"
   },
   "metadata": {
-    "description": "Agent plugins for observing and controlling an Unraid server via the unraid-cli toolkit."
+    "description": "Agent plugins for observing and controlling an Unraid server via the unraid-toolkit toolkit."
   },
   "plugins": [
     {
       "name": "unraid-assistant",
       "source": "./agent-plugins/unraid-assistant",
-      "description": "Teaches an AI agent to observe and control an Unraid server via the unraid-cli MCP tools or the `unraid` CLI, including the read-only / safe-write / destructive safety model.",
+      "description": "Teaches an AI agent to observe and control an Unraid server via the unraid-toolkit MCP tools or the `unraid` CLI, including the read-only / safe-write / destructive safety model.",
       "tags": [
         "unraid",
         "nas",

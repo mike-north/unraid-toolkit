@@ -1,13 +1,13 @@
 ---
 schemaVersion: 0.1.0
 name: unraid-assistant
-description: "Use when the user wants to observe or control an Unraid server (their NAS / tower / box) — checking health, system metrics, the storage array and parity, physical disks, user shares, Docker containers, virtual machines, UPS power, or notifications; and when starting/stopping/updating any of those. Teaches the agent to drive either the unraid-cli MCP tools (the unraid_* tools) or the `unraid` CLI, and the read-only / safe-write / destructive safety model that gates writes."
+description: "Use when the user wants to observe or control an Unraid server (their NAS / tower / box) — checking health, system metrics, the storage array and parity, physical disks, user shares, Docker containers, virtual machines, UPS power, or notifications; and when starting/stopping/updating any of those. Teaches the agent to drive either the unraid-toolkit MCP tools (the unraid_* tools) or the `unraid` CLI, and the read-only / safe-write / destructive safety model that gates writes."
 ---
 
 # Engaging with an Unraid server
 
 This skill teaches you to observe and control an [Unraid](https://unraid.net) server
-through the **unraid-cli** toolkit, which talks to Unraid's built-in GraphQL API
+through the **unraid-toolkit** toolkit, which talks to Unraid's built-in GraphQL API
 (Unraid 7.2+). There are two surfaces — use whichever is wired up:
 
 - **MCP tools** (names start with `unraid_`) — preferred when present. You call them directly.
@@ -44,8 +44,9 @@ Get the API key from the Unraid web UI: **Settings → Management Access → API
 - **MCP path:** these are passed to the server (e.g. via the bundled `.mcp.json`, which runs
   `docker.io/mikenorth/unraid-mcp`). If the server is already running on the Unraid box over
   HTTP, the user points their client at it instead — you just call the tools.
-- **CLI path:** export the env vars, or pass `--url`, `--api-key`, and `--insecure` per call.
-  CLI output is JSON by default; add `--human` for readable text.
+- **CLI path:** install the CLI with `npm i -g unraid-toolkit` (provides the `unraid` command),
+  then export the env vars or pass `--url`, `--api-key`, and `--insecure` per call. CLI output is
+  JSON by default; add `--human` for readable text.
 
 ## The safety model (read this before any write)
 
