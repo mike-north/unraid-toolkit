@@ -56,7 +56,7 @@ invoke and behave accordingly.**
 | --------------- | -------------------------------------------------------------------- | ---------------- |
 | **Read-only**   | health, system info/metrics, list/status/overview, logs, history     | Safe and idempotent. Call freely. |
 | **Safe write**  | start/stop/pause/unpause/update a container; start/stop/pause/resume a VM; archive a notification; pause/resume a parity check | Reversible, low-risk. State changes — say what you're about to do, then do it. |
-| **Destructive** | start/stop the **array**; add/remove/mount/unmount a disk; start/cancel a parity check; remove a container; force-stop/reset a VM | Irreversible or high-blast-radius. Requires explicit human approval (below). Never auto-approve. |
+| **Destructive** | start/stop the **array**; add/remove/mount/unmount a disk; start/cancel a parity check; remove a container; reboot/force-stop/reset a VM | Irreversible or high-blast-radius. Requires explicit human approval (below). Never auto-approve. |
 
 **Server-side policy floor (MCP).** The server can refuse a write regardless of what you ask,
 and the refusal is not your fault — surface it to the user:
@@ -102,8 +102,8 @@ read-only tool first, summarize what you found, and confirm before any write.
 | Past parity checks           | `unraid_parity_history`                        | `unraid array parity-history` |
 | List physical disks          | `unraid_list_disks`                            | `unraid disks list` |
 | Start / stop the array 🔴    | `unraid_array_set_state`                       | `unraid array start --yes` / `unraid array stop --yes` |
-| Add / remove a disk 🔴       | `unraid_array_add_disk` / `unraid_array_remove_disk` | `unraid array add-disk <id> --yes` / `remove-disk <id> --yes` |
-| Mount / unmount a disk 🔴    | `unraid_array_mount_disk` / `unraid_array_unmount_disk` | `unraid array mount-disk <id> --yes` / `unmount-disk <id> --yes` |
+| Add / remove a disk 🔴       | `unraid_array_add_disk` / `unraid_array_remove_disk` | `unraid array add-disk <id> --yes` / `unraid array remove-disk <id> --yes` |
+| Mount / unmount a disk 🔴    | `unraid_array_mount_disk` / `unraid_array_unmount_disk` | `unraid array mount-disk <id> --yes` / `unraid array unmount-disk <id> --yes` |
 | Start a parity check 🔴      | `unraid_parity_start` (`correct: true` writes to parity) | `unraid parity start [--correct] --yes` |
 | Cancel a parity check 🔴     | `unraid_parity_cancel`                         | `unraid parity cancel --yes` |
 | Pause / resume parity check  | `unraid_parity_pause` / `unraid_parity_resume` | `unraid parity pause` / `unraid parity resume` |
@@ -126,8 +126,8 @@ read-only tool first, summarize what you found, and confirm before any write.
 | Intent                         | MCP tool                                         | CLI |
 | ------------------------------ | ------------------------------------------------ | --- |
 | List VMs + run state           | `unraid_list_vms`                                | `unraid vm list` |
-| Start/stop/pause/resume/reboot | `unraid_vm_start` / `_stop` / `_pause` / `_resume` / `_reboot` | `unraid vm <action> <id>` |
-| Force-stop / hard-reset 🔴     | `unraid_vm_force_stop` / `unraid_vm_reset`       | `unraid vm force-stop <id> --yes` / `vm reset <id> --yes` |
+| Start/stop/pause/resume        | `unraid_vm_start` / `unraid_vm_stop` / `unraid_vm_pause` / `unraid_vm_resume` | `unraid vm start <id>` / `unraid vm stop <id>` / `unraid vm pause <id>` / `unraid vm resume <id>` |
+| Reboot / force-stop / hard-reset 🔴 | `unraid_vm_reboot` / `unraid_vm_force_stop` / `unraid_vm_reset` | `unraid vm reboot <id> --yes` / `unraid vm force-stop <id> --yes` / `unraid vm reset <id> --yes` |
 
 ### Shares, UPS & notifications
 
@@ -138,7 +138,7 @@ read-only tool first, summarize what you found, and confirm before any write.
 | Notification counts by severity | `unraid_notifications_overview` | `unraid notifications overview` |
 | List notifications            | `unraid_list_notifications` (queue `UNREAD`/`ARCHIVE`, optional severity) | `unraid notifications list` |
 | Create a notification         | `unraid_create_notification`   | `unraid notifications create` |
-| Archive / unarchive           | `unraid_archive_notification` / `unraid_unarchive_notification` | `unraid notifications archive <id>` / `unarchive <id>` |
+| Archive / unarchive           | `unraid_archive_notification` / `unraid_unarchive_notification` | `unraid notifications archive <id>` / `unraid notifications unarchive <id>` |
 
 🔴 = destructive — gated by human approval (see the safety model).
 
